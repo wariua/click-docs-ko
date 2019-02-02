@@ -1,152 +1,144 @@
-Why Click?
-==========
+왜 클릭이어야 하나?
+===================
 
-There are so many libraries out there for writing command line utilities;
-why does Click exist?
+명령행 유틸리티 작성을 위한 라이브러리가 잔뜩 있는데 왜 클릭이
+필요한 걸까?
 
-This question is easy to answer: because there is not a single command
-line utility for Python out there which ticks the following boxes:
+답은 간단하다. 다음 모두에 해당하는 파이썬용 단일 명령행 유틸리티가
+없기 때문이다.
 
-*   is lazily composable without restrictions
-*   supports implementation of Unix/POSIX command line conventions
-*   supports loading values from environment variables out of the box
-*   supports for prompting of custom values
-*   is fully nestable and composable
-*   works the same in Python 2 and 3
-*   supports file handling out of the box
-*   comes with useful common helpers (getting terminal dimensions,
-    ANSI colors, fetching direct keyboard input, screen clearing,
-    finding config paths, launching apps and editors, etc.)
+*   제약 없이 게으르게 조립 가능
+*   유닉스/POSIX 명령행 규약 구현 지원
+*   환경 변수 값 적재 알아서 지원
+*   프롬프트로 값 물어보기 지원
+*   계층 구조로 조립 가능
+*   파이썬 2와 3에서 동일하게 동작
+*   파일 처리를 알아서 지원
+*   유용한 공용 헬퍼 제공 (터미널 크기 얻기, ANSI 색상, 키보드
+    직접 입력 받기, 화면 지우기, 설정 경로 찾기, 응용 및 편집기
+    띄우기 등)
 
-There are many alternatives to Click and you can have a look at them if
-you enjoy them better.  The obvious ones are ``optparse`` and ``argparse``
-from the standard library.
+클릭 대신 쓸 수 있는 게 많이 있으니 얼마나 좋은 건지 살펴볼 수 있다.
+당장 표준 라이브러리의 ``optparse`` 와 ``argparse`` 가 있다.
 
-Click is actually implemented as a wrapper around a mild fork of
-``optparse`` and does not implement any parsing itself.  The reason it's
-not based on ``argparse`` is that ``argparse`` does not allow proper
-nesting of commands by design and has some deficiencies when it comes to
-POSIX compliant argument handling.
+사실 클릭은 ``optparse`` 를 살짝 포크 한 걸 감싼 형태로 구현돼 있으며
+파싱을 자체적으로 구현하고 있지 않다. ``argparse`` 를 기반으로 하지
+않는 이유는 설계상 ``argparse`` 에서는 명령들을 제대로 계층화하기
+어렵고 POSIX 방식 인자 처리에서 몇 가지 부족한 점이 있기 때문이다.
 
-Click is designed to be fun to work with and at the same time not stand in
-your way.  It's not overly flexible either.  Currently, for instance, it
-does not allow you to customize the help pages too much. This is intentional
-because Click is designed to allow you to nest command line utilities.  The
-idea is that you can have a system that works together with another system by
-tacking two Click instances together and they will continue working as they
-should.
+클릭은 쓰기에 재밌으면서도 뭔가 하는 데 방해가 되지 않도록 설계되었다.
+그러면서 과도하게 유연하지는 않다. 예를 들어 현재는 도움말 페이지를
+아주 많이는 바꿀 수 없다. 이는 의도적인 것이다. 명령행 도구들을
+계층으로 붙일 수 있도록 클릭이 설계돼 있기 때문이다. 말하자면 클릭
+인스턴스 두 개를 갖다 붙이기만 하면 함께 동작하는 시스템이 나오고
+이전과 마찬가지로 동작하는 것이다.
 
-Too much customizability would break this promise.
+변경을 너무 많이 허용하면 이 약속이 깨지게 된다.
 
-Click was written to support the `Flask <http://flask.pocoo.org/>`_
-microframework ecosystem because no tool could provide it with the
-functionality it needed.
+클릭이 만들어진 건 `플라스크 <http://flask.pocoo.org/>`_
+마이크로프레임워크 에코시스템을 지원하기 위해서였다. 거기 필요한
+기능을 제공하는 도구가 없었기 때문이다.
 
-To get an understanding of what Click is all about, I strongly recommend
-looking at the :ref:`complex-guide` chapter to see what it's useful for.
+클릭이 어디까지 가능하고 얼마나 유용한지 알고 싶다면 :ref:`complex-guide`
+장을 보기를 권한다.
 
-Why not Argparse?
------------------
+argparse는 왜 아닌가?
+---------------------
 
-Click is internally based on optparse instead of argparse.  This however
-is an implementation detail that a user does not have to be concerned
-with.  The reason however Click is not using argparse is that it has some
-problematic behaviors that make handling arbitrary command line interfaces
-hard:
+클릭은 내부적으로 argparse가 아닌 optparse를 기반으로 한다. 사용자가
+신경 쓸 필요 없는 구현 세부 내용이기는 하지만, 클릭에서 argparse를 쓰지
+않는 이유는 명령행 인터페이스를 자유롭게 다루기 어렵게 하는 동작 방식이
+몇 가지 있기 때문이다.
 
-*   argparse has built-in magic behavior to guess if something is an
-    argument or an option.  This becomes a problem when dealing with
-    incomplete command lines as it's not possible to know without having a
-    full understanding of the command line how the parser is going to
-    behave.  This goes against Click's ambitions of dispatching to
-    subparsers.
-*   argparse currently does not support disabling of interspersed
-    arguments.  Without this feature it's not possible to safely implement
-    Click's nested parsing nature.
+*   argparse에는 뭔가가 인자인지 옵션인지 추측하는 동작이 내장돼 있다.
+    불완전한 명령행을 다룰 때 이게 문제가 되는데, 명령행을 완전히 알고
+    있지 않으면 파서가 어떻게 동작할지 알 수가 없기 때문이다. 명령행을
+    하위 파서로 보내려는 클릭의 의도와 맞지 않는다.
+*   현재 argparse에서는 사이에 위치한 인자들을 비활성화 하는 걸
+    지원하지 않는다. 이 기능 없이는 클릭의 계층적 파싱 방식을 안전하게
+    구현하는 게 불가능하다.
 
-Why not Docopt etc.?
---------------------
+docopt 등은 왜 아닌가?
+----------------------
 
-Docopt and many tools like it are cool in how they work, but very few of
-these tools deal with nesting of commands and composability in a way like
-Click.  To the best of the developer's knowledge, Click is the first
-Python library that aims to create a level of composability of applications
-that goes beyond what the system itself supports.
+docopt 및 여러 유사 도구들은 멋진 방식으로 동작하지만 명령 계층화와
+조립을 클릭 같은 방식으로 다루는 경우는 거의 없다. 개발자가 알고 있는
+한 클릭은 시스템 자체에서 지원하는 수준 이상으로 응용을 조립할 수 있게
+하는 걸 목표로 한 첫 번째 파이썬 라이브러리이다.
 
-Docopt, for instance, acts by parsing your help pages and then parsing
-according to those rules.  The side effect of this is that docopt is quite
-rigid in how it handles the command line interface.  The upside of docopt
-is that it gives you strong control over your help page; the downside is
-that due to this it cannot rewrap your output for the current terminal
-width and it makes translations hard.  On top of that docopt is restricted
-to basic parsing.  It does not handle argument dispatching and callback
-invocation or types.  This means there is a lot of code that needs to be
-written in addition to the basic help page to handle the parsing results.
+예를 들어 docopt에서는 도움말 페이지를 파싱 한 다음 그 규칙들에 따라
+인자를 파싱 하는 식으로 동작한다. 이로 인한 부대 효과는 docopt가
+명령행 인터페이스를 다루는 방식이 꽤 엄격하다는 것이다. docopt의
+좋은 점은 도움말 페이지를 확실히 통제할 수 있다는 점이다. 반면 나쁜
+점은 그로 인해 출력을 현재 터미널 폭에 맞게 다시 줄바꿈 할 수 없으며
+번역이 어렵다는 점이다. 또한 docopt는 기본적인 수준의 파싱만 한다.
+인자 전달하며 콜백 호출하기나 타입 처리가 안 된다. 따라서 기본적인
+도움말 페이지에 더해서 파싱 결과를 다루기 위한 많은 코드를 작성해야
+한다.
 
-Most of all, however, it makes composability hard.  While docopt does
-support dispatching to subcommands, it for instance does not directly
-support any kind of automatic subcommand enumeration based on what's
-available or it does not enforce subcommands to work in a consistent way.
+무엇보다도 그 때문에 조립이 어려워진다. docopt에서 하위 명령으로
+보내기를 분명 지원하기는 하지만 예를 들어 사용 가능한 하위 명령들을
+자동 열거하는 걸 어떤 식으로든 직접 지원하지 않으며 하위 명령들이
+일관적으로 동작하게 강제하지도 않는다.
 
-This is fine, but it's different from how Click wants to work.  Click aims
-to support fully composable command line user interfaces by doing the
-following:
+그게 문제는 아니지만 클릭에서 원하는 동작 방식과는 다르다. 클릭의
+목표는 다음을 통해 완벽하게 조립 가능한 명령행 사용자 인터페이스가
+가능하게 하는 것이다.
 
--   Click does not just parse, it also dispatches to the appropriate code.
--   Click has a strong concept of an invocation context that allows
-    subcommands to respond to data from the parent command.
--   Click has strong information available for all parameters and commands
-    so that it can generate unified help pages for the full CLI and to
-    assist the user in converting the input data as necessary.
--   Click has a strong understanding of what types are and can give the user
-    consistent error messages if something goes wrong.  A subcommand
-    written by a different developer will not suddenly die with a
-    different error messsage because it's manually handled.
--   Click has enough meta information available for its whole program
-    that it can evolve over time to improve the user experience without
-    forcing developers to adjust their programs.  For instance, if Click
-    decides to change how help pages are formatted, all Click programs
-    will automatically benefit from this.
+-   클릭은 입력을 파싱만 하는 게 아니라 적절한 코드로 보내기까지 한다.
+-   클릭은 호출 문맥이라는 강력한 개념이 있어서 하위 명령에서
+    부모 명령의 데이터에 대응할 수 있다.
+-   클릭에는 모든 매개변수 및 명령에 대한 강력한 정보가 있어서
+    CLI 전체에 대한 통합된 도움말 페이지를 생성할 수 있으며 사용자가
+    필요에 따라 입력 데이터를 변환하는 데 도움을 준다.
+-   클릭에서는 타입이 뭔지를 확실히 알고 있어서 뭔가 잘못됐을 때
+    사용자에게 일관성 있는 오류 메시지를 표시해 준다. 오류 메시지를
+    수동으로 처리해서 다른 개발자가 작성한 하위 명령이 다른 방식의
+    오류 메시지와 함께 갑자기 죽는 일이 없다.
+-   클릭에는 전체 프로그램에 대한 충분한 메타 정보가 있어서
+    시간에 따라 클릭이 발전해 나가면서 개발자가 프로그램을 조정할
+    필요 없이 사용자 경험을 향상시킬 수 있다. 예를 들어 클릭에서
+    도움말 페이지에 서식을 주는 방식을 바꾸기로 하면 모든 클릭
+    프로그램들이 자동으로 그 혜택을 받게 된다.
 
-The aim of Click is to make composable systems, whereas the aim of docopt
-is to build the most beautiful and hand-crafted command line interfaces.
-These two goals conflict with one another in subtle ways.  Click
-actively prevents people from implementing certain patterns in order to
-achieve unified command line interfaces.  You have very little input on
-reformatting your help pages for instance.
+클릭의 목표가 조립 가능한 시스템을 만드는 것인 반면 docopt의
+목표는 매우 아름다운 수공예 명령행 인터페이스를 구성하는 것이다.
+이 두 목표는 미묘한 방식으로 서로 충돌한다. 클릭에서는
+통일된 명령행 인터페이스라는 목표를 위해 사람들이 특정 패턴을
+구현하지 못하게 적극적으로 막는다. 예를 들어 도움말 페이지
+형식을 바꾸는 데 줄 수 있는 입력이 거의 없다.
 
 
-Why Hardcoded Behaviors?
+왜 동작을 하드코딩 했나?
 ------------------------
 
-The other question is why Click goes away from optparse and hardcodes
-certain behaviors instead of staying configurable.  There are multiple
-reasons for this.  The biggest one is that too much configurability makes
-it hard to achieve a consistent command line experience.
+또 다른 질문은 왜 optparse와는 다르게 클릭에서는 특정 동작을
+설정 가능하게 두지 않고 하드 코딩 했느냐이다. 여기에는 여러 이유가
+있는데, 가장 큰 이유는 설정 가능성이 과도하면 일관성 있는 명령행
+경험을 달성하기 어려워지기 때문이다.
 
-The best example for this is optparse's ``callback`` functionality for
-accepting arbitrary number of arguments.  Due to syntactical ambiguities
-on the command line, there is no way to implement fully variadic arguments.
-There are always tradeoffs that need to be made and in case of
-``argparse`` these tradeoffs have been critical enough, that a system like
-Click cannot even be implemented on top of it.
+가장 좋은 예가 optparse에서 임의 개수 인자를 받기 위한
+``callback`` 기능이다. 명령행에서의 문법적 모호함 때문에
+가변 개수 인자를 완전하게 구현할 수 있는 방법은 없다.
+항상 어떤 지점에서 타협을 해야 하는데 ``argparse`` 의 경우에는
+그런 타협이 너무 중대한 것들이어서 그 위에서 클릭 같은 시스템을
+구현하는 게 불가능하다.
 
-In this particular case, Click attempts to stay with a handful of accepted
-paradigms for building command line interfaces that can be well documented
-and tested.
+이 특별한 경우에 있어서 클릭은 잘 문서화 하고 테스트 할 수 있는
+명령행 인터페이스를 구성하기 위한 일반적으로 인정되는 몇 가지
+방식들을 따르려고 노력한다.
 
 
-Why No Auto Correction?
+왜 자동 정정을 안 하나?
 -----------------------
 
-The question came up why Click does not auto correct parameters given that
-even optparse and argparse support automatic expansion of long arguments.
-The reason for this is that it's a liability for backwards compatibility.
-If people start relying on automatically modified parameters and someone
-adds a new parameter in the future, the script might stop working.  These
-kinds of problems are hard to find so Click does not attempt to be magical
-about this.
+optparse와 argparse에서도 긴 인자들의 자동 확장을 지원하는데
+왜 클릭에서 매개변수 자동 정정을 하지 않느냐는 질문이 있었다.
+그 이유는 하위 호환성과 관련된 골칫거리 때문이다.
+사람들이 자동으로 바뀌는 매개변수에 기대기 시작하고 이후 누군가
+새 매개변수를 추가하면 스크립트가 동작하지 않거나 할 수도 있다.
+이런 종류의 문제는 찾아내기가 어렵고, 그래서 클릭에서는 자동
+마술을 부리려 하지 않는다.
 
-This sort of behavior however can be implemented on a higher level to
-support things such as explicit aliases.  For more information see
-:ref:`aliases`.
+하지만 명시적 별칭 같은 걸 지원하기 위해 상위 수준에서 그런
+동작을 구현할 수는 있다. 자세한 내용은 :ref:`aliases` 참고.
