@@ -1,14 +1,14 @@
-License
-=======
+라이선스
+========
 
-Click is licensed under a three-clause BSD License.  It basically means:
-do whatever you want with it as long as the copyright in Click sticks
-around, the conditions are not modified and the disclaimer is present.
-Furthermore, you must not use the names of the authors to promote derivatives
-of the software without written consent.
+3조항 BSD 라이선스에 따라 클릭 사용이 허가된다. 그 기본 의미는
+클릭 저작권 문구가 붙어 있고 그 조건들이 변경되지 않고 책임 부인이
+있기만 하다면 원하는 대로 뭐든지 할 수 있다는 뜻이다.
+또한 서면 동의 없이는 소프트웨어 파생물을 홍보하는 데 저작자들의
+이름을 이용해선 안 된다.
 
-License Text
-------------
+라이선스 본문
+-------------
 
 .. include:: ../LICENSE.rst
 
