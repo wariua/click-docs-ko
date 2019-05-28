@@ -1,61 +1,57 @@
-Quickstart
-==========
+빨리 해 보기
+============
 
 .. currentmodule:: click
 
-You can get the library directly from PyPI::
+PyPI에서 바로 라이브러리를 받을 수 있다. ::
 
     pip install click
 
-The installation into a :ref:`virtualenv` is heavily recommended.
+:ref:`virtualenv` 안에 설치하기를 강력히 권한다.
 
 .. _virtualenv:
 
 virtualenv
 ----------
 
-Virtualenv is probably what you want to use for developing Click
-applications.
+클릭 응용을 개발할 때 아마 virtualenv를 쓰고 싶을 것이다.
 
-What problem does virtualenv solve?  Chances are that you want to use it
-for other projects besides your Click script.  But the more projects you
-have, the more likely it is that you will be working with different
-versions of Python itself, or at least different versions of Python
-libraries.  Let's face it: quite often libraries break backwards
-compatibility, and it's unlikely that any serious application will have
-zero dependencies.  So what do you do if two or more of your projects have
-conflicting dependencies?
+virtualenv가 해결해 주는 문제가 뭘까? 아마 작성한 클릭 스크립트뿐
+아니라 다른 프로젝트들에도 함께 쓰고 싶을 것이다. 프로젝트가
+늘어날수록 파이썬을 여러 버전을 써서, 또는 적어도 파이썬
+라이브러리들을 여러 버전을 써 가며 작업하게 될 가능성이 높다.
+그리고 우리가 인정해야 할 현실은 라이브러리들에서 하위 호환성을
+깨는 경우가 꽤 많다는 것이고, 제대로 된 응용에 의존성이 없을
+가능성은 낮다는 것이다. 그렇다면 작성하는 둘 이상의 프로젝트에서
+의존성이 충돌한다면 어떻게 해야 할까?
 
-Virtualenv to the rescue!  Virtualenv enables multiple side-by-side
-installations of Python, one for each project.  It doesn't actually
-install separate copies of Python, but it does provide a clever way to
-keep different project environments isolated.  Let's see how virtualenv
-works.
+virtualenv가 있다! virtualenv를 쓰면 각 프로젝트마다 하나씩 여러
+개의 파이썬 설치 환경을 만들 수 있다. 실제로 파이썬 사본을 따로
+설치하는 것 아니고 똑똑한 어떤 방식으로 프로젝트 환경들을 격리해
+준다. virtualenv가 어떻게 동작하는지 살펴보자.
 
-If you are on Mac OS X or Linux, chances are that one of the following two
-commands will work for you::
+맥 OS X나 리눅스에서라면 아마 다음 두 명령 중 하나가 동작할 것이다. ::
 
     $ sudo easy_install virtualenv
 
-or even better::
+더 좋은 방식::
 
     $ sudo pip install virtualenv
 
-One of these will probably install virtualenv on your system.  Maybe it's even
-in your package manager.  If you use Ubuntu, try::
+아마 이 중 한 명령으로 시스템에 virtualenv가 설치될 것이다. 또
+어쩌면 패키지 관리자에 있을 수도 있다. 우분투를 쓴다면 이렇게
+해 보자. ::
 
     $ sudo apt-get install python-virtualenv
 
-If you are on Windows (or none of the above methods worked) you must install
-``pip`` first.  For more information about this, see `installing pip`_.
-Once you have it installed, run the ``pip`` command from above, but without
-the `sudo` prefix.
+윈도우를 쓴다면 (또는 위 방법 어느 것도 안 된다면) 먼저 ``pip`` 를
+설치해야 한다. 자세한 내용은 `pip 설치하기`_ 를 보라. 설치를
+마쳤으면 위의 ``pip`` 명령을 앞의 `sudo` 를 빼고 실행하면 된다.
 
-.. _installing pip: https://pip.readthedocs.io/en/latest/installing.html
+.. _pip 설치하기: https://pip.readthedocs.io/en/latest/installing.html
 
-Once you have virtualenv installed, just fire up a shell and create
-your own environment.  I usually create a project folder and a `venv`
-folder within::
+virtualenv를 설치했으면 셸을 하나 띄워서 새 환경을 만들자.
+보통 프로젝트 폴더를 만들고 그 안에 `venv` 폴더를 만든다. ::
 
     $ mkdir myproject
     $ cd myproject
@@ -63,73 +59,73 @@ folder within::
     New python executable in venv/bin/python
     Installing setuptools, pip............done.
 
-Now, whenever you want to work on a project, you only have to activate the
-corresponding environment.  On OS X and Linux, do the following::
+이제 프로젝트 작업을 하고 싶을 때마다 해당 환경을 활성화해
+주기만 하면 된다. OS X와 리눅스에서는 다음처럼 한다. ::
 
     $ . venv/bin/activate
 
-If you are a Windows user, the following command is for you::
+윈도우 사용자라면 다음 명령을 쓰면 된다. ::
 
     $ venv\scripts\activate
 
-Either way, you should now be using your virtualenv (notice how the prompt of
-your shell has changed to show the active environment).
+어느 방식을 통해서든 이제 그 virtualenv를 사용하게 됐다.
+(셸 프롬프트가 활성 환경을 보여 주도록 바뀐 걸 알 수 있다.)
 
-And if you want to go back to the real world, use the following command::
+그리고 실제 세계로 돌아가고 싶으면 다음 명령을 쓰면 된다. ::
 
     $ deactivate
 
-After doing this, the prompt of your shell should be as familiar as before.
+그러면 셸 프롬프트가 이전처럼 익숙한 모습으로 돌아간다.
 
-Now, let's move on. Enter the following command to get Click activated in your
-virtualenv::
+이제 시작해 보자. 다음 명령을 입력해서 새로 만든 virtualenv
+안에서 Click이 작동하게 하자. ::
 
     $ pip install Click
 
-A few seconds later and you are good to go.
+몇 초 기다리면 이제 준비 완료이다.
 
-Screencast and Examples
------------------------
+스크린캐스트와 예시
+-------------------
 
-There is a screencast available which shows the basic API of Click and
-how to build simple applications with it.  It also explores how to build
-commands with subcommands.
+클릭의 기본 API와 간단한 응용 제작 방법을 보여 주는
+스크린캐스트가 있다. 하위 명령이 있는 명령들을 만드는
+방법도 볼 수 있다.
 
-*   `Building Command Line Applications with Click
+*   `클릭으로 명령행 응용 만들기
     <https://www.youtube.com/watch?v=kNke39OZ2k0>`_
 
-Examples of Click applications can be found in the documentation as well
-as in the GitHub repository together with readme files:
+이 문서뿐 아니라 GitHub 저장소에서도 readme 파일까지 있는
+클릭 예시 응용들을 찾을 수 있다.
 
-*   ``inout``: `File input and output
+*   ``inout``: `파일 입력과 출력
     <https://github.com/pallets/click/tree/master/examples/inout>`_
-*   ``naval``: `Port of docopt naval example
+*   ``naval``: `docopt의 naval 예시 포팅
     <https://github.com/pallets/click/tree/master/examples/naval>`_
-*   ``aliases``: `Command alias example
+*   ``aliases``: `명령 별칭 예시
     <https://github.com/pallets/click/tree/master/examples/aliases>`_
-*   ``repo``: `Git-/Mercurial-like command line interface
+*   ``repo``: `Git/Mercurial 방식 명령행 인터페이스
     <https://github.com/pallets/click/tree/master/examples/repo>`_
-*   ``complex``: `Complex example with plugin loading
+*   ``complex``: `플러그인을 적재하는 복잡한 예시
     <https://github.com/pallets/click/tree/master/examples/complex>`_
-*   ``validation``: `Custom parameter validation example
+*   ``validation``: `매개변수 검증 예시
     <https://github.com/pallets/click/tree/master/examples/validation>`_
-*   ``colors``: `Colorama ANSI color support
+*   ``colors``: `Colorama ANSI 색상 지원
     <https://github.com/pallets/click/tree/master/examples/colors>`_
-*   ``termui``: `Terminal UI functions demo
+*   ``termui``: `터미널 UI 함수 시연
     <https://github.com/pallets/click/tree/master/examples/termui>`_
-*   ``imagepipe``: `Multi command chaining demo
+*   ``imagepipe``: `연쇄 명령 시연
     <https://github.com/pallets/click/tree/master/examples/imagepipe>`_
 
-Basic Concepts - Creating a Command
------------------------------------
+기본 개념 - 명령 만들기
+-----------------------
 
-Click is based on declaring commands through decorators.  Internally, there
-is a non-decorator interface for advanced use cases, but it's discouraged
-for high-level usage.
+클릭의 기본은 데코레이터를 통해 명령을 선언하는 것이다. 고급 사용
+방식을 위한 데코레이터 아닌 인터페이스가 내부적으로 있기는 하지만
+위쪽 층위에서 쓰는 걸 권장하지 않는다.
 
-A function becomes a Click command line tool by decorating it through
-:func:`click.command`.  At its simplest, just decorating a function
-with this decorator will make it into a callable script:
+:func:`click.command` 를 통해 꾸며 주면 함수가 클릭 명령행 도구가
+된다. 간단하게는 어떤 함수를 이 데코레이터로 꾸며 주기만 하면
+호출 가능한 스크립트가 된다.
 
 .. click:example::
 
@@ -139,54 +135,52 @@ with this decorator will make it into a callable script:
     def hello():
         click.echo('Hello World!')
 
-What's happening is that the decorator converts the function into a
-:class:`Command` which then can be invoked::
+이렇게 하면 데코레이터가 함수를 :class:`Command` 로 변환하고,
+그걸 다음처럼 호출할 수 있다. ::
 
     if __name__ == '__main__':
         hello()
 
-And what it looks like:
+다음처럼 실행할 수 있다.
 
 .. click:run::
 
     invoke(hello, args=[], prog_name='python hello.py')
 
-And the corresponding help page:
+도움말 페이지도 있다.
 
 .. click:run::
 
     invoke(hello, args=['--help'], prog_name='python hello.py')
 
-Echoing
--------
+echo
+----
 
-Why does this example use :func:`echo` instead of the regular
-:func:`print` function?  The answer to this question is that Click
-attempts to support both Python 2 and Python 3 the same way and to be very
-robust even when the environment is misconfigured.  Click wants to be
-functional at least on a basic level even if everything is completely
-broken.
+왜 이 예시에서는 표준 :func:`print` 함수 대신 :func:`echo` 를
+쓸까? 답은 클릭에서 파이썬 2와 파이썬 3 모두를 같은 방식으로
+지원하고 환경이 잘못 구성된 경우에도 아주 견고하게 동작하려
+하기 때문이다. 클릭은 모든 게 완전히 고장난 경우에조차도
+적어도 기본적인 수준에서는 동작이 되고자 한다.
 
-What this means is that the :func:`echo` function applies some error
-correction in case the terminal is misconfigured instead of dying with an
-:exc:`UnicodeError`.
+즉 터미널이 잘못 구성돼 있는 경우에 :func:`echo` 함수는
+:exc:`UnicodeError` 로 죽는 대신 어떤 오류 정정을 한다.
 
-As an added benefit, starting with Click 2.0, the echo function also
-has good support for ANSI colors.  It will automatically strip ANSI codes
-if the output stream is a file and if colorama is supported, ANSI colors
-will also work on Windows. Note that in Python 2, the :func:`echo` function
-does not parse color code information from bytearrays. See :ref:`ansi-colors`
-for more information.
+추가로 클릭 2.0부터는 echo 함수에서 ANSI 색상도 잘 지원해 준다.
+출력 스트림이 파일이면 자동으로 ANSI 코드를 제거해 주고
+colorama가 제공되면 윈도우에서도 ANSI 색상이 동작하게 된다.
+참고로 파이썬 2에서는 :func:`echo` 함수가 bytearray의
+색상 코드 정보를 파싱 하지 않는다. 자세한 내용은
+:ref:`ansi-colors` 절 참고.
 
-If you don't need this, you can also use the `print()` construct /
-function.
+이런 게 필요치 않다면 `print()` 구성체/함수를 쓸 수도 있다.
 
-Nesting Commands
-----------------
+명령 계층화
+-----------
 
-Commands can be attached to other commands of type :class:`Group`.  This
-allows arbitrary nesting of scripts.  As an example here is a script that
-implements two commands for managing databases:
+명령들을 :class:`Group` 타입인 다른 명령에 갖다 붙일 수 있다.
+이를 이용하면 스크립트들을 마음대로 계층 구조로 만들 수 있다.
+예를 들어 다음은 데이터베이스 관리를 위한 두 가지 명령을
+구현하는 스크립트이다.
 
 .. click:example::
 
@@ -205,13 +199,13 @@ implements two commands for managing databases:
     cli.add_command(initdb)
     cli.add_command(dropdb)
 
-As you can see, the :func:`group` decorator works like the :func:`command`
-decorator, but creates a :class:`Group` object instead which can be given
-multiple subcommands that can be attached with :meth:`Group.add_command`.
+보다시피 :func:`group` 데코레이터는 :func:`command` 데코레이터와
+비슷하게 동작하되 대신 :class:`Group` 객체를 생성한다. 그 객체에
+:meth:`Group.add_command` 로 하위 명령들을 붙일 수 있다.
 
-For simple scripts, it's also possible to automatically attach and create a
-command by using the :meth:`Group.command` decorator instead.  The above
-script can instead be written like this:
+스크립트를 간단하게 만들기 위해 :meth:`Group.command` 데코레이터를
+대신 써서 자동으로 명령을 붙여서 만드는 것도 가능하다. 위
+스크립트를 다음처럼 작성할 수 있다.
 
 .. click:example::
 
@@ -227,16 +221,17 @@ script can instead be written like this:
     def dropdb():
         click.echo('Dropped the database')
 
-You would then invoke the :class:`Group` in your setuptools entry points or
-other invocations::
+그러고 나서는 setuptools 진입 지점이나 다른 호출점에서
+:class:`Group` 을 호출하게 된다. ::
 
     if __name__ == '__main__':
         cli()
 
-Adding Parameters
+매개변수 추가하기
 -----------------
 
-To add parameters, use the :func:`option` and :func:`argument` decorators:
+매개변수를 추가하려면 :func:`option` 및 :func:`argument` 데코레이터를
+쓰면 된다.
 
 .. click:example::
 
@@ -247,7 +242,7 @@ To add parameters, use the :func:`option` and :func:`argument` decorators:
         for x in range(count):
             click.echo('Hello %s!' % name)
 
-What it looks like:
+그러면 다음처럼 된다.
 
 .. click:run::
 
@@ -255,28 +250,27 @@ What it looks like:
 
 .. _switching-to-setuptools:
 
-Switching to Setuptools
------------------------
+setuptools로 바꾸기
+-------------------
 
-In the code you wrote so far there is a block at the end of the file which
-looks like this: ``if __name__ == '__main__':``.  This is traditionally
-how a standalone Python file looks like.  With Click you can continue
-doing that, but there are better ways through setuptools.
+지금까지 작성한 코드에서는 파일 끝에 ``if __name__ == '__main__':``
+비슷한 블록이 있다. 전통적으로 단독형 파이썬 파일의 형태가 이렇다.
+클릭을 쓰면서 계속 이렇게 할 수도 있지만 setuptools를 쓰는 더 좋은
+방식도 있다.
 
-There are two main (and many more) reasons for this:
+그렇게 하는 주된 이유가 두 가지 있다. (다른 이유도 많다.)
 
-The first one is that setuptools automatically generates executable
-wrappers for Windows so your command line utilities work on Windows too.
+첫 번째는 setuptools가 윈도우를 위한 실행 가능 래퍼를 자동으로
+생성해 주기 때문에 명령행 유틸리티가 윈도우에서도 동작한다는 점이다.
 
-The second reason is that setuptools scripts work with virtualenv on Unix
-without the virtualenv having to be activated.  This is a very useful
-concept which allows you to bundle your scripts with all requirements into
-a virtualenv.
+두 번째 이유는 유닉스에서 virtualenv를 활성화하지 않아도 setuptools
+스크립트들이 virtualenv와 잘 동작한다는 점이다. 이는 매우 유용한
+개념으로, 덕분에 모든 필요 모듈들을 virtualenv에 넣어서 배포할
+스크립트들과 함께 묶을 수 있다.
 
-Click is perfectly equipped to work with that and in fact the rest of the
-documentation will assume that you are writing applications through
-setuptools.
+클릭은 그렇게 동작할 준비가 완벽하게 돼 있으며 실제로 이 문서
+나머지에서는 setuptools를 통해 응용을 작성한다고 가정할 것이다.
 
-I strongly recommend to have a look at the :ref:`setuptools-integration`
-chapter before reading the rest as the examples assume that you will
-be using setuptools.
+예시들에서 setuptools 사용을 가정하고 있으므로 나머지 부분을
+읽기 전에 :ref:`setuptools-integration` 장을 살펴보기를
+강력히 권한다.
