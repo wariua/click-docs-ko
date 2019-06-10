@@ -1,1 +1,1 @@
-builds/7.x/html
+srcs/7.x/docs/_build/html

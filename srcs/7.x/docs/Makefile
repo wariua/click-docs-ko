@@ -6,7 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = Jinja
 SOURCEDIR     = .
-BUILDDIR      = ../../../builds/7.x
+BUILDDIR      = _build
 
 # Put it first so that "make" without argument is like "make help".
 help:
