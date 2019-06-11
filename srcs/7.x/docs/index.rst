@@ -32,7 +32,7 @@
     @click.option('--name', prompt='이름',
                   help='인사를 받을 사람.')
     def hello(count, name):
-        """NAME에게 총 COUNT 번 인사를 하는 간단한 프로그램"""
+        """NAME에게 COUNT 번 인사를 하는 간단한 프로그램"""
         for x in range(count):
             click.echo('Hello %s!' % name)
 
