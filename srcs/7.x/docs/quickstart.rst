@@ -45,8 +45,8 @@ virtualenv가 있다! virtualenv를 쓰면 각 프로젝트마다 하나씩 여�
     $ sudo apt-get install python-virtualenv
 
 윈도우를 쓴다면 (또는 위 방법 어느 것도 안 된다면) 먼저 ``pip`` 를
-설치해야 한다. 자세한 내용은 `pip 설치하기`_ 를 보라. 설치를
-마쳤으면 위의 ``pip`` 명령을 앞의 `sudo` 를 빼고 실행하면 된다.
+설치해야 한다. 자세한 내용은 `pip 설치하기`_\를 보라. 설치를
+마쳤으면 위의 ``pip`` 명령을 앞의 `sudo`\를 빼고 실행하면 된다.
 
 .. _pip 설치하기: https://pip.readthedocs.io/en/latest/installing.html
 
@@ -123,7 +123,7 @@ virtualenv를 설치했으면 셸을 하나 띄워서 새 환경을 만들자.
 방식을 위한 데코레이터 아닌 인터페이스가 내부적으로 있기는 하지만
 위쪽 층위에서 쓰는 걸 권장하지 않는다.
 
-:func:`click.command` 를 통해 꾸며 주면 함수가 클릭 명령행 도구가
+:func:`click.command`\를 통해 꾸며 주면 함수가 클릭 명령행 도구가
 된다. 간단하게는 어떤 함수를 이 데코레이터로 꾸며 주기만 하면
 호출 가능한 스크립트가 된다.
 
@@ -135,7 +135,7 @@ virtualenv를 설치했으면 셸을 하나 띄워서 새 환경을 만들자.
     def hello():
         click.echo('Hello World!')
 
-이렇게 하면 데코레이터가 함수를 :class:`Command` 로 변환하고,
+이렇게 하면 데코레이터가 함수를 :class:`Command`\로 변환하고,
 그걸 다음처럼 호출할 수 있다. ::
 
     if __name__ == '__main__':
@@ -156,14 +156,14 @@ virtualenv를 설치했으면 셸을 하나 띄워서 새 환경을 만들자.
 echo
 ----
 
-왜 이 예시에서는 표준 :func:`print` 함수 대신 :func:`echo` 를
+왜 이 예시에서는 표준 :func:`print` 함수 대신 :func:`echo`\를
 쓸까? 답은 클릭에서 파이썬 2와 파이썬 3 모두를 같은 방식으로
 지원하고 환경이 잘못 구성된 경우에도 아주 견고하게 동작하려
 하기 때문이다. 클릭은 모든 게 완전히 고장난 경우에조차도
 적어도 기본적인 수준에서는 동작이 되고자 한다.
 
 즉 터미널이 잘못 구성돼 있는 경우에 :func:`echo` 함수는
-:exc:`UnicodeError` 로 죽는 대신 어떤 오류 정정을 한다.
+:exc:`UnicodeError`\로 죽는 대신 어떤 오류 정정을 한다.
 
 추가로 클릭 2.0부터는 echo 함수에서 ANSI 색상도 잘 지원해 준다.
 출력 스트림이 파일이면 자동으로 ANSI 코드를 제거해 주고
@@ -201,7 +201,7 @@ colorama가 제공되면 윈도우에서도 ANSI 색상이 동작하게 된다.
 
 보다시피 :func:`group` 데코레이터는 :func:`command` 데코레이터와
 비슷하게 동작하되 대신 :class:`Group` 객체를 생성한다. 그 객체에
-:meth:`Group.add_command` 로 하위 명령들을 붙일 수 있다.
+:meth:`Group.add_command`\로 하위 명령들을 붙일 수 있다.
 
 스크립트를 간단하게 만들기 위해 :meth:`Group.command` 데코레이터를
 대신 써서 자동으로 명령을 붙여서 만드는 것도 가능하다. 위
@@ -222,7 +222,7 @@ colorama가 제공되면 윈도우에서도 ANSI 색상이 동작하게 된다.
         click.echo('Dropped the database')
 
 그러고 나서는 setuptools 진입 지점이나 다른 호출점에서
-:class:`Group` 을 호출하게 된다. ::
+:class:`Group`\을 호출하게 된다. ::
 
     if __name__ == '__main__':
         cli()
