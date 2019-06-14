@@ -1,54 +1,53 @@
 .. _setuptools-integration:
 
-Setuptools Integration
-======================
+setuptools 사용
+===============
 
-When writing command line utilities, it's recommended to write them as
-modules that are distributed with setuptools instead of using Unix
-shebangs.
+명령행 유틸리티를 작성할 때는 유닉스의 #!을 이용하는 것보다는
+setuptools 배포 모듈로 작성하기를 권장한다.
 
-Why would you want to do that?  There are a bunch of reasons:
+왜 그래야 할까? 많은 이유가 있다.
 
-1.  One of the problems with the traditional approach is that the first
-    module the Python interpreter loads has an incorrect name.  This might
-    sound like a small issue but it has quite significant implications.
+1.  전통적 방식의 문제점 하나는 파이썬 인터프리터가 처음
+    적재하는 모듈이 잘못된 이름을 가지게 된다는 것이다. 사소한
+    문제처럼 들릴 수도 있겠지만 그로 인한 영향이 꽤 크다.
 
-    The first module is not called by its actual name, but the
-    interpreter renames it to ``__main__``.  While that is a perfectly
-    valid name it means that if another piece of code wants to import from
-    that module it will trigger the import a second time under its real
-    name and all of a sudden your code is imported twice.
+    첫 번째 모듈이 실제 이름으로 불리는 게 아니라 인터프리터에서
+    이름을 ``__main__``\으로 바꾼다. 완벽하게 유효한 이름이기는
+    하지만 그 때문에 어떤 다른 코드에서 그 모듈을 임포트 하려고
+    하면 실제 이름으로 두 번째 임포트가 일어나게 되고 그래서
+    느닷없이 코드가 두 번 임포트 된다.
 
-2.  Not on all platforms are things that easy to execute.  On Linux and OS
-    X you can add a comment to the beginning of the file (``#!/usr/bin/env
-    python``) and your script works like an executable (assuming it has
-    the executable bit set).  This however does not work on Windows.
-    While on Windows you can associate interpreters with file extensions
-    (like having everything ending in ``.py`` execute through the Python
-    interpreter) you will then run into issues if you want to use the
-    script in a virtualenv.
+2.  뭔가를 실행하는 게 모든 플랫폼에서 그렇게 간단하지는 않다.
+    리눅스와 OS X에서는 파일 처음에 주석(``#!/usr/bin/env
+    python``)을 추가하면 스크립트가 (실행 비트가 설정돼 있으면)
+    실행 파일처럼 동작한다. 하지만 윈도우에서는 이게 안 된다.
+    윈도우에서 파일 확장자에 인터프리터를 연계할 수 있기는
+    하지만 (가령 ``.py`` 로 끝나는 파일이 모두 파이썬
+    인터프리터를 통해 실행되게 할 수 있지만) 그러면 virtualenv
+    안에서 그 스크립트를 사용하려고 할 때 문제가 생긴다.
 
-    In fact running a script in a virtualenv is an issue with OS X and
-    Linux as well.  With the traditional approach you need to have the
-    whole virtualenv activated so that the correct Python interpreter is
-    used.  Not very user friendly.
+    사실 virtualenv 안에서 스크립트를 실행하는 건 OS X와
+    리눅스에서도 문제가 된다. 전통적 방식으로 올바른 파이썬
+    인터프리터를 쓰려면 virtualenv 전체를 활성화시켜야 한다.
+    별로 사용자 친화적이지 않다.
 
-3.  The main trick only works if the script is a Python module.  If your
-    application grows too large and you want to start using a package you
-    will run into issues.
+3.  스크립트가 파이썬 모듈일 때만 main 방식이 통한다. 응용이
+    너무 커져서 패키지를 쓰고 싶어질 때가 되면 여러 문제들을
+    만나게 된다.
 
-Introduction
-------------
+도입
+----
 
-To bundle your script with setuptools, all you need is the script in a
-Python package and a ``setup.py`` file.
+스크립트를 setuptools로 묶으려면 파이썬 패키지로 된 스크립트와
+``setup.py`` 파일만 있으면 된다.
 
-Imagine this directory structure::
+다음 같은 디렉터리 구조를 상상해 보자. ::
 
     yourscript.py
     setup.py
 
-Contents of ``yourscript.py``:
+``yourscript.py`` 내용:
 
 .. click:example::
 
@@ -56,10 +55,10 @@ Contents of ``yourscript.py``:
 
     @click.command()
     def cli():
-        """Example script."""
+        """예시 스크립트."""
         click.echo('Hello World!')
 
-Contents of ``setup.py``::
+``setup.py`` 내용::
 
     from setuptools import setup
 
@@ -76,36 +75,34 @@ Contents of ``setup.py``::
         ''',
     )
 
-The magic is in the ``entry_points`` parameter.  Below
-``console_scripts``, each line identifies one console script.  The first
-part before the equals sign (``=``) is the name of the script that should
-be generated, the second part is the import path followed by a colon
-(``:``) with the Click command.
+핵심은 ``entry_points`` 매개변수이다. ``console_scripts`` 아래의
+각 행이 콘솔 스크립트 하나씩을 나타낸다. 등호(``=``) 앞의 부분은
+생성할 스크립트 이름이고 뒷부분은 임포트 경로에 콜론(``:``)과
+클릭 명령을 붙인 것이다.
 
-That's it.
+이게 전부다.
 
-Testing The Script
-------------------
+스크립트 테스트
+---------------
 
-To test the script, you can make a new virtualenv and then install your
-package::
+스크립트를 테스트 하기 위해 새 virtualenv를 만들어서 패키지를
+설치해 볼 수 있다. ::
 
     $ virtualenv venv
     $ . venv/bin/activate
     $ pip install --editable .
 
-Afterwards, your command should be available:
+그러면 명령이 사용 가능해진다.
 
 .. click:run::
 
     invoke(cli, prog_name='yourscript')
 
-Scripts in Packages
--------------------
+패키지 형태 스크립트
+--------------------
 
-If your script is growing and you want to switch over to your script being
-contained in a Python package the changes necessary are minimal.  Let's
-assume your directory structure changed to this::
+스크립트가 커져서 파이썬 패키지로 전환하려 할 때는 약간만
+변경해 주면 된다. 디렉터리 구조가 다음처럼 바뀌었다고 하자. ::
 
     yourpackage/
         __init__.py
@@ -115,12 +112,11 @@ assume your directory structure changed to this::
             __init__.py
             yourscript.py
 
-In this case instead of using ``py_modules`` in your ``setup.py`` file you
-can use ``packages`` and the automatic package finding support of
-setuptools.  In addition to that it's also recommended to include other
-package data.
+이 경우 ``setup.py``\에서 ``py_modules``\를 쓰는 대신 ``packages``\를
+쓰고 setuptools의 자동 패키지 탐색 기능을 이용할 수 있다. 더불어
+기타 패키지 데이터를 포함시키는 것도 권장한다.
 
-These would be the modified contents of ``setup.py``::
+바뀐 ``setup.py`` 내용은 다음과 같을 것이다. ::
 
     from setuptools import setup, find_packages
 
