@@ -1,59 +1,59 @@
-Parameters
-==========
+매개변수
+========
 
 .. currentmodule:: click
 
-Click supports two types of parameters for scripts: options and arguments.
-There is generally some confusion among authors of command line scripts of
-when to use which, so here is a quick overview of the differences.  As its
-name indicates, an option is optional.  While arguments can be optional
-within reason, they are much more restricted in how optional they can be.
+클릭에서는 스크립트에 두 가지 종류의 매개변수를 지원하는데,
+옵션(option)과 인자(argument)다. 명령행 스크립트 작성자들 중에
+이 둘을 헛갈리는 경우가 좀 있다. 차이점을 간단히 살펴 보자면,
+옵션은 이름 그대로 선택적이다. 인자는 일정 정도로 선택적일 수
+있기는 하지만 선택적일 수 있는 방식에 훨씬 많은 제약이 있다.
 
-To help you decide between options and arguments, the recommendation is
-to use arguments exclusively for things like going to subcommands or input
-filenames / URLs, and have everything else be an option instead.
+옵션과 인자 중에 선택해야 하는 경우라면 하위 명령을 만들 때나
+파일명/URL을 입력받는 경우 등에만 인자를 쓰고 그 외는 모두
+옵션으로 하기를 권한다.
 
-Differences
------------
+차이점
+------
 
-Arguments can do less than options.  The following features are only
-available for options:
+인자로는 할 수 있는 게 옵션보다 적다. 다음 기능들은 옵션에서만
+가능하다.
 
-*   automatic prompting for missing input
-*   act as flags (boolean or otherwise)
-*   option values can be pulled from environment variables, arguments can not
-*   options are fully documented in the help page, arguments are not
-    (this is intentional as arguments might be too specific to be
-    automatically documented)
+*   빠진 입력을 자동으로 묻기.
+*   플래그로 동작하기. (불리언 또는 다른 방식)
+*   환경 변수에서 옵션 값을 가져올 수 있음. 인자는 안 됨.
+*   도움말 페이지에 옵션들은 모두 나오지만 인자는 나오지 않음.
+    (이는 의도적인 것이다. 인자는 자동으로 표시하기에는 너무
+    상세할 수 있다.)
 
-On the other hand arguments, unlike options, can accept an arbitrary number
-of arguments.  Options can strictly ever only accept a fixed number of
-arguments (defaults to 1).
+한편으로 옵션과 달리 인자로는 임의 개수의 인자를 받을 수 있다.
+옵션으로는 만약 받는다면 정확히 고정된 개수(기본 1)의 인자만
+받을 수 있다.
 
-Parameter Types
----------------
+매개변수 타입
+-------------
 
-Parameters can be of different types.  Types can be implemented with
-different behavior and some are supported out of the box:
+매개변수 타입으로 여러 가지가 가능하다. 각기 다른 동작 방식으로
+타입이 정의되며 기본적으로 지원하는 타입이 몇 가지 있다.
 
 ``str`` / :data:`click.STRING`:
-    The default parameter type which indicates unicode strings.
+    기본 매개변수 타입이고 유니코드 문자열을 나타냄.
 
 ``int`` / :data:`click.INT`:
-    A parameter that only accepts integers.
+    정수만 받는 매개변수.
 
 ``float`` / :data:`click.FLOAT`:
-    A parameter that only accepts floating point values.
+    부동소수점 값만 받는 매개변수.
 
 ``bool`` / :data:`click.BOOL`:
-    A parameter that accepts boolean values.  This is automatically used
-    for boolean flags.  If used with string values ``1``, ``yes``, ``y``, ``t``
-    and ``true`` convert to `True` and ``0``, ``no``, ``n``, ``f`` and ``false``
-    convert to `False`.
+    불리언 값을 받는 매개변수. 불리언 플래그에는 자동으로 이
+    타입이 쓰인다. 문자열 값 ``1``, ``yes``, ``y``, ``t``,
+    ``true``\는 `True`\로 변환되고 ``0``, ``no``, ``n``, ``f``,
+    ``false``\는 `False`\로 변환된다.
 
 :data:`click.UUID`:
-    A parameter that accepts UUID values.  This is not automatically
-    guessed but represented as :class:`uuid.UUID`.
+    UUID 값을 받는 매개변수. 자동으로 이 타입으로 추측하지
+    않으며 :class:`uuid.UUID`\로 표현한다.
 
 .. autoclass:: File
    :noindex:
@@ -73,49 +73,48 @@ different behavior and some are supported out of the box:
 .. autoclass:: DateTime
    :noindex:
 
-Custom parameter types can be implemented by subclassing
-:class:`click.ParamType`.  For simple cases, passing a Python function that
-fails with a `ValueError` is also supported, though discouraged.
+:class:`click.ParamType`\의 하위 클래스를 만들어서 새로운 매개변수
+타입을 구현할 수 있다. 더 간단하게는 실패 시 `ValueError`\를 던지는
+파이썬 함수를 전달하는 방식도 지원하지만 권하진 않는다.
 
 .. _parameter_names:
 
-Parameter Names
----------------
+매개변수 이름
+-------------
 
-Parameters (both options and arguments) accept a number of positional arguments
-which are passed to the command function as parameters. Each string with a
-single dash is added as a short argument; each string starting with a double
-dash as a long one.
+매개변수(옵션과 인자 모두)는 정해진 수의 위치 인자들을 받으며
+그 인자들은 명령 함수 매개변수로 전달된다. 대시 한 개가 있는
+문자열은 짧은 인자로 추가되고 대시 두 개로 시작하는 문자열은
+긴 옵션으로 추가된다.
 
-If a string is added without any dashes, it becomes the internal parameter name
-which is also used as variable name.
+대시 없이 추가하는 문자열은 내부 매개변수 이름이 되고
+그 이름이 변수 이름으로도 쓰인다.
 
-If all names for a parameter contain dashes, the internal name is generated
-automatically by taking the longest argument and converting all dashes to
-underscores.
+어떤 매개변수를 위한 이름들에 모두 대시가 있는 경우에는
+가장 긴 인자를 골라 대시를 모두 밑줄로 바꿔서 자동으로
+내부 이름을 생성한다.
 
-The internal name is converted to lowercase.
+그리고 그 내부 이름을 소문자로 바꾼다.
 
-Examples:
+예시:
 
-* For an option with ``('-f', '--foo-bar')``, the parameter name is `foo_bar`.
-* For an option with ``('-x',)``, the parameter is `x`.
-* For an option with ``('-f', '--filename', 'dest')``, the parameter name is  `dest`.
-* For an option with ``('--CamelCaseOption',)``, the parameter is `camelcaseoption`.
-* For an arguments with ``(`foogle`)``, the parameter name is `foogle`. To
-  provide a different human readable name for use in help text, see the section
-  about :ref:`doc-meta-variables`.
+* 옵션에 ``('-f', '--foo-bar')``\를 주면 매개변수 이름이 `foo_bar`\다.
+* 옵션에 ``('-x',)``\를 주면 매개변수가 `x`\다.
+* 옵션에 ``('-f', '--filename', 'dest')``\를 주면 매개변수 이름이 `dest`\다.
+* 옵션에 ``('--CamelCaseOption',)``\을 주면 매개변수가 `camelcaseoption`\이다.
+* 인자에 ``(`foogle`)``\을 주면 매개변수 이름이 `foogle`\이다.
+  도움말에 표시할 읽기 좋은 이름을 제공하려면 :ref:`doc-meta-variables`
+  절을 보라.
 
-Implementing Custom Types
--------------------------
+새로운 타입 구현하기
+--------------------
 
-To implement a custom type, you need to subclass the :class:`ParamType`
-class.  Types can be invoked with or without context and parameter object,
-which is why they need to be able to deal with this.
+새로운 타입을 구현하려면 :class:`ParamType` 클래스의 하위 클래스를
+만들어야 한다. 타입 호출 시 문맥 및 매개변수 객체가 있을 수도 있고
+없을 수도 있으며, 그래서 그 경우들을 다룰 수 있어야 한다.
 
-The following code implements an integer type that accepts hex and octal
-numbers in addition to normal integers, and converts them into regular
-integers::
+다음 코드는 일반 정수에 추가로 16진수와 8진수도 받아서 보통 정수로
+바꿔 주는 정수 타입을 구현한 것이다. ::
 
     import click
 
@@ -134,6 +133,6 @@ integers::
 
     BASED_INT = BasedIntParamType()
 
-As you can see, a subclass needs to implement the :meth:`ParamType.convert`
-method and optionally provide the :attr:`ParamType.name` attribute.  The
-latter can be used for documentation purposes.
+보다시피 하위 클래스에서 :meth:`ParamType.convert` 메소드를 구현해야
+한다. 선택적으로 :attr:`ParamType.name` 속성을 제공할 수 있는데,
+문서화 용도로만 쓰인다.
