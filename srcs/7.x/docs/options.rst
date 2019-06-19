@@ -1,20 +1,20 @@
 .. _options:
 
-Options
-=======
+옵션
+====
 
 .. currentmodule:: click
 
-Adding options to commands can be accomplished by the :func:`option`
-decorator.  Since options can come in various different versions, there
-are a ton of parameters to configure their behavior. Options in click are
-distinct from :ref:`positional arguments <arguments>`.
+:func:`option` 데코레이터를 이용해 명령에 옵션을 추가할 수 있다.
+옵션들의 형태는 다양하므로 동작 방식을 설정하기 위한 매개변수들이
+많이 있다. 클릭에서는 옵션과 :ref:`위치 인자 <arguments>`\를
+구별한다.
 
-Name Your Options
------------------
+옵션 이름
+---------
 
-The naming rules can be found in :ref:`parameter_names`. In short, you
-can refer the option **implicitly** by the longest dash-prefixed argument:
+:ref:`parameter_names` 절에서 명명 규칙을 볼 수 있다. 요약하면
+앞에 대시가 붙은 가장 긴 인자로 옵션을 **묵시적으로** 가리킬 수 있다.
 
 .. click:example::
 
@@ -23,7 +23,7 @@ can refer the option **implicitly** by the longest dash-prefixed argument:
     def echo(string_to_echo):
         click.echo(string_to_echo)
 
-Or, **explicitly**, by giving one non-dash-prefixed argument:
+또는 대시 없는 인자를 줘서 **명시적으로** 가리킬 수도 있다.
 
 .. click:example::
 
@@ -32,16 +32,15 @@ Or, **explicitly**, by giving one non-dash-prefixed argument:
     def echo(string):
         click.echo(string)
 
-Basic Value Options
--------------------
+기본 값 옵션
+------------
 
-The most basic option is a value option.  These options accept one
-argument which is a value.  If no type is provided, the type of the default
-value is used.  If no default value is provided, the type is assumed to be
-:data:`STRING`.  Unless a name is explicitly specified, the name of the
-parameter is the first long option defined; otherwise the first short one is
-used. By default, options are not required, however to make an option required,
-simply pass in `required=True` as an argument to the decorator.
+가장 기본적인 옵션은 값 옵션이다. 이 옵션들은 값 인자 하나를 받는다.
+타입을 주지 않으면 기본값의 타입을 쓴다. 기본값을 주지 않으면 타입이
+:data:`STRING`\이라고 상정한다. 이름을 명시적으로 지정하지 않으면
+정의된 첫 번째 긴 옵션이 매개변수 이름이 된다. 없으면 첫 번째 짧은
+옵션을 쓴다. 기본적으로 옵션은 필수가 아니다. 옵션을 필수로 만들려면
+데코레이터 인자로 `required=True`\를 주면 된다.
 
 .. click:example::
 
@@ -52,7 +51,7 @@ simply pass in `required=True` as an argument to the decorator.
 
 .. click:example::
 
-    # How to make an option required
+    # 옵션을 필수로 만들기
     @click.command()
     @click.option('--n', required=True, type=int)
     def dots(n):
@@ -60,23 +59,23 @@ simply pass in `required=True` as an argument to the decorator.
 
 .. click:example::
 
-    # How to use a Python reserved word such as `from` as a parameter
+    # 매개변수로 `from` 같은 파이썬 예약어 쓰기
     @click.command()
     @click.option('--from', '-f', 'from_')
     @click.option('--to', '-t')
     def reserved_param_name(from_, to):
         click.echo('from %s to %s' % (from_, to))
 
-And on the command line:
+명령행:
 
 .. click:run::
 
    invoke(dots, args=['--n=2'])
 
-In this case the option is of type :data:`INT` because the default value
-is an integer.
+이 경우 기본값이 정수이므로 옵션이 :data:`INT` 타입이다.
 
-To show the default values when showing command help, use ``show_default=True``
+명령 도움말을 보일 때 기본값을 표시하려면 ``show_default=True``\를
+쓰면 된다.
 
 .. click:example::
 
@@ -89,12 +88,12 @@ To show the default values when showing command help, use ``show_default=True``
 
    invoke(dots, args=['--help'])
 
-Multi Value Options
--------------------
+여러 값 옵션
+------------
 
-Sometimes, you have options that take more than one argument.  For options,
-only a fixed number of arguments is supported.  This can be configured by
-the ``nargs`` parameter.  The values are then stored as a tuple.
+때로는 인자를 여러 개 받는 옵션이 있다. 옵션에서는 고정 개수 인자만
+지원된다. ``nargs`` 매개변수로 개수를 설정할 수 있다. 그러면 값들이
+튜플로 저장된다.
 
 .. click:example::
 
@@ -103,7 +102,7 @@ the ``nargs`` parameter.  The values are then stored as a tuple.
     def findme(pos):
         click.echo('%s / %s' % pos)
 
-And on the command line:
+명령행:
 
 .. click:run::
 
@@ -111,15 +110,15 @@ And on the command line:
 
 .. _tuple-type:
 
-Tuples as Multi Value Options
------------------------------
+여러 값 튜플 옵션
+-----------------
 
 .. versionadded:: 4.0
 
-As you can see that by using `nargs` set to a specific number each item in
-the resulting tuple is of the same type.  This might not be what you want.
-Commonly you might want to use different types for different indexes in
-the tuple.  For this you can directly specify a tuple as type:
+보다시피 `nargs`\를 써서 개수를 지정하면 결과 튜플의 각 항목이
+같은 타입이 된다. 원하는 게 이게 아닐 수도 있다. 보통은 튜플
+인덱스에 따라 다른 타입을 쓰고 싶을 수도 있을 것이다.
+그렇다면 타입을 직접 튜플로 지정할 수 있다.
 
 .. click:example::
 
@@ -128,15 +127,15 @@ the tuple.  For this you can directly specify a tuple as type:
     def putitem(item):
         click.echo('name=%s id=%d' % item)
 
-And on the command line:
+명령행:
 
 .. click:run::
 
     invoke(putitem, args=['--item', 'peter', '1338'])
 
-By using a tuple literal as type, `nargs` gets automatically set to the
-length of the tuple and the :class:`click.Tuple` type is automatically
-used.  The above example is thus equivalent to this:
+튜플 리터럴을 타입으로 쓰면 `nargs`\가 자동으로 그 튜플 길이로
+설정되고 자동으로 :class:`click.Tuple` 타입이 쓰인다.
+즉 위 예는 다음과 동등하다.
 
 .. click:example::
 
@@ -145,16 +144,16 @@ used.  The above example is thus equivalent to this:
     def putitem(item):
         click.echo('name=%s id=%d' % item)
 
-Multiple Options
-----------------
+다중 옵션
+---------
 
-Similarly to ``nargs``, there is also the case of wanting to support a
-parameter being provided multiple times to and have all values recorded --
-not just the last one.  For instance, ``git commit -m foo -m bar`` would
-record two lines for the commit message: ``foo`` and ``bar``. This can be
-accomplished with the ``multiple`` flag:
+``nargs``\와 비슷하게 매개변수를 여러 번 지정하는 걸 지원하면서
+(마지막 값만이 아니라) 모든 값이 기록되게 하고 싶은 경우도 있다.
+예를 들어 ``git commit -m foo -m bar``\라고 하면 커밋 메시지를
+``foo``\와 ``bar`` 두 줄 기록하게 된다. ``multiple`` 플래그로
+그렇게 할 수 있다.
 
-Example:
+예:
 
 .. click:example::
 
@@ -163,18 +162,17 @@ Example:
     def commit(message):
         click.echo('\n'.join(message))
 
-And on the command line:
+명령행:
 
 .. click:run::
 
     invoke(commit, args=['-m', 'foo', '-m', 'bar'])
 
-Counting
---------
+개수 세기
+---------
 
-In some very rare circumstances, it is interesting to use the repetition
-of options to count an integer up.  This can be used for verbosity flags,
-for instance:
+일부 아주 드문 상황에선 옵션 반복 횟수를 정수로 세고 싶을 수 있다.
+예를 들어 상세 수준 플래그에 쓸 수 있다.
 
 .. click:example::
 
@@ -183,23 +181,23 @@ for instance:
     def log(verbose):
         click.echo('Verbosity: %s' % verbose)
 
-And on the command line:
+명령행:
 
 .. click:run::
 
     invoke(log, args=['-vvv'])
 
-Boolean Flags
+불리언 플래그
 -------------
 
-Boolean flags are options that can be enabled or disabled.  This can be
-accomplished by defining two flags in one go separated by a slash (``/``)
-for enabling or disabling the option.  (If a slash is in an option string,
-Click automatically knows that it's a boolean flag and will pass
-``is_flag=True`` implicitly.)  Click always wants you to provide an enable
-and disable flag so that you can change the default later.
+불리언 플래그란 켜거나 끌 수 있는 옵션이다. 옵션을 켜거나 끄기
+위한 두 플래그를 슬래시(``/``)로 구분해서 한꺼번에 정의하면 된다.
+(옵션 문자열 안에 슬래시가 있으면 클릭에선 자동으로 불리언
+플래그임을 알고 암묵적으로 ``is_flag=True``\를 전달한다.)
+클릭에서는 나중에 기본값을 바꿀 수 있도록 항상 켜는 플래그와
+끄는 플래그를 모두 제공하기를 기대한다.
 
-Example:
+예:
 
 .. click:example::
 
@@ -213,15 +211,15 @@ Example:
             rv = rv.upper() + '!!!!111'
         click.echo(rv)
 
-And on the command line:
+명령행:
 
 .. click:run::
 
     invoke(info, args=['--shout'])
     invoke(info, args=['--no-shout'])
 
-If you really don't want an off-switch, you can just define one and
-manually inform Click that something is a flag:
+끄는 스위치가 정말 필요 없다면 한쪽만 정의하고 그게 플래그라는
+걸 클릭에게 수동으로 알려 주면 된다.
 
 .. click:example::
 
@@ -235,15 +233,15 @@ manually inform Click that something is a flag:
             rv = rv.upper() + '!!!!111'
         click.echo(rv)
 
-And on the command line:
+명령행:
 
 .. click:run::
 
     invoke(info, args=['--shout'])
 
-Note that if a slash is contained in your option already (for instance, if
-you use Windows-style parameters where ``/`` is the prefix character), you
-can alternatively split the parameters through ``;`` instead:
+참고로 옵션에 이미 슬래시가 들어간다면 (예를 들어 ``/``\가 앞에 오는
+윈도우 방식 매개변수를 쓴다면) 대신 ``;``\을 써서 매개변수들을
+나눌 수 있다.
 
 .. click:example::
 
@@ -257,10 +255,10 @@ can alternatively split the parameters through ``;`` instead:
 
 .. versionchanged:: 6.0
 
-If you want to define an alias for the second option only, then you will
-need to use leading whitespace to disambiguate the format string:
+두 번째 옵션에만 별칭을 주고 싶다면 형식 문자열에서 앞에 공백을
+줘서 구별해 줘야 한다.
 
-Example:
+예:
 
 .. click:example::
 
@@ -278,16 +276,16 @@ Example:
 
     invoke(info, args=['--help'])
 
-Feature Switches
-----------------
+기능 스위치
+-----------
 
-In addition to boolean flags, there are also feature switches.  These are
-implemented by setting multiple options to the same parameter name and
-defining a flag value.  Note that by providing the ``flag_value`` parameter,
-Click will implicitly set ``is_flag=True``.
+불리언 플래그 말고도 기능 스위치라는 것도 있다. 같은 매개변수 이름으로
+여러 옵션을 설정하고 플래그 값을 정의해 주면 된다. 참고로
+``flag_value`` 매개변수를 주면 클릭에서 암묵적으로 ``is_flag=True``\를
+설정한다.
 
-To set a default flag, assign a value of `True` to the flag that should be
-the default.
+기본 플래그를 설정하려면 기본으로 할 플래그에 ``default``\를
+`True`\로 할당해 주면 된다.
 
 .. click:example::
 
@@ -300,7 +298,7 @@ the default.
     def info(transformation):
         click.echo(getattr(sys.platform, transformation)())
 
-And on the command line:
+명령행:
 
 .. click:run::
 
@@ -310,14 +308,14 @@ And on the command line:
 
 .. _choice-opts:
 
-Choice Options
---------------
+선택 옵션
+---------
 
-Sometimes, you want to have a parameter be a choice of a list of values.
-In that case you can use :class:`Choice` type.  It can be instantiated
-with a list of valid values.
+때로는 값 목록에서 고르는 매개변수가 필요하다. 그런 경우
+:class:`Choice` 타입을 쓸 수 있다. 유효한 값들의 목록을 줘서
+생성할 수 있다.
 
-Example:
+예:
 
 .. click:example::
 
@@ -326,7 +324,7 @@ Example:
     def digest(hash_type):
         click.echo(hash_type)
 
-What it looks like:
+다음처럼 된다.
 
 .. click:run::
 
@@ -338,19 +336,19 @@ What it looks like:
 
 .. note::
 
-    You should only pass the choices as list or tuple.  Other iterables (like
-    generators) may lead to surprising results.
+    선택지를 리스트나 튜플로만 줘야 한다. (제너레이터 같은) 다른
+    이터러블은 예상치 못한 결과를 유발할 수 있다.
 
 .. _option-prompting:
 
-Prompting
----------
+값 묻기
+-------
 
-In some cases, you want parameters that can be provided from the command line,
-but if not provided, ask for user input instead.  This can be implemented with
-Click by defining a prompt string.
+어떤 경우에는 명령행에서 줄 수도 있지만 안 주면 사용자 입력을
+요구하는 매개변수가 필요하다. 클릭에서는 ``prompt``\를 `True`\로
+정의해 주면 된다.
 
-Example:
+예:
 
 .. click:example::
 
@@ -359,15 +357,15 @@ Example:
     def hello(name):
         click.echo('Hello %s!' % name)
 
-And what it looks like:
+그러면 다음처럼 된다.
 
 .. click:run::
 
     invoke(hello, args=['--name=John'])
     invoke(hello, input=['John'])
 
-If you are not happy with the default prompt string, you can ask for
-a different one:
+기본 질문 문자열이 마음에 들지 않는다면 다른 문자열로
+물을 수 있다.
 
 .. click:example::
 
@@ -376,17 +374,17 @@ a different one:
     def hello(name):
         click.echo('Hello %s!' % name)
 
-What it looks like:
+다음처럼 된다.
 
 .. click:run::
 
     invoke(hello, input=['John'])
 
-Password Prompts
-----------------
+패스워드 묻기
+-------------
 
-Click also supports hidden prompts and asking for confirmation.  This is
-useful for password input:
+클릭에서는 글자 숨기기와 확인용 재입력도 지원한다. 패스워드 입력에
+유용하다.
 
 .. click:example::
 
@@ -396,14 +394,14 @@ useful for password input:
     def encrypt(password):
         click.echo('Encrypting password to %s' % password.encode('rot13'))
 
-What it looks like:
+다음처럼 된다.
 
 .. click:run::
 
     invoke(encrypt, input=['secret', 'secret'])
 
-Because this combination of parameters is quite common, this can also be
-replaced with the :func:`password_option` decorator:
+매개변수들을 이렇게 조합해 쓰는 게 꽤 흔하기 때문에 대신
+:func:`password_option` 데코레이터를 쓸 수도 있다.
 
 .. click:example::
 
@@ -412,18 +410,17 @@ replaced with the :func:`password_option` decorator:
     def encrypt(password):
         click.echo('Encrypting password to %s' % password.encode('rot13'))
 
-Dynamic Defaults for Prompts
-----------------------------
+동적 프롬프트 기본값
+--------------------
 
-The ``auto_envvar_prefix`` and ``default_map`` options for the context
-allow the program to read option values from the environment or a
-configuration file.  However, this overrides the prompting mechanism, so
-that the user does not get the option to change the value interactively.
+문맥 옵션 ``auto_envvar_prefix`` 및 ``default_map``\을 통해
+환경이나 설정 파일로부터 옵션 값을 읽을 수 있다.
+하지만 이 방식은 프롬프트 동작을 무시하며, 그래서 사용자가
+대화식으로 값을 바꿀 방법이 없다.
 
-If you want to let the user configure the default value, but still be
-prompted if the option isn't specified on the command line, you can do so
-by supplying a callable as the default value. For example, to get a default
-from the environment:
+사용자가 기본값을 설정할 수 있도록 하되 명령행에 옵션이 없으면
+물어보도록 하고 싶다면 기본값으로 호출 가능 객체를 주면 된다.
+예를 들어 환경에서 기본값을 얻으려면 다음처럼 하면 된다.
 
 .. click:example::
 
@@ -433,7 +430,7 @@ from the environment:
     def hello(username):
         print("Hello,", username)
 
-To describe what the default value will be, set it in ``show_default``.
+뭐가 기본값이 되는지 설명해 주려면 ``show_default``\에 설정하면 된다.
 
 .. click:example::
 
@@ -448,32 +445,31 @@ To describe what the default value will be, set it in ``show_default``.
 
    invoke(hello, args=['--help'])
 
-Callbacks and Eager Options
----------------------------
+콜백과 긴급 옵션
+----------------
 
-Sometimes, you want a parameter to completely change the execution flow.
-For instance, this is the case when you want to have a ``--version``
-parameter that prints out the version and then exits the application.
+때로는 매개변수에 의해 실행 흐름이 완전히 달라지게 하고 싶은
+경우가 있다. 예를 들어 ``--version`` 매개변수가 있어서 버전을
+찍고 바로 응용을 끝내고 싶은 경우가 그렇다.
 
-Note: an actual implementation of a ``--version`` parameter that is
-reusable is available in Click as :func:`click.version_option`.  The code
-here is merely an example of how to implement such a flag.
+참고: 재사용 가능한 ``--version`` 매개변수 구현이 클릭에
+:func:`click.version_option`\으로 포함돼 있다. 여기 있는 코드는
+그런 플래그를 어떻게 구현할 수 있는지 보여 주기 위한 예일 뿐이다.
 
-In such cases, you need two concepts: eager parameters and a callback.  An
-eager parameter is a parameter that is handled before others, and a
-callback is what executes after the parameter is handled.  The eagerness
-is necessary so that an earlier required parameter does not produce an
-error message.  For instance, if ``--version`` was not eager and a
-parameter ``--foo`` was required and defined before, you would need to
-specify it for ``--version`` to work.  For more information, see
-:ref:`callback-evaluation-order`.
+그런 경우에 두 가지 개념이 필요한데, 긴급(eager) 매개변수와
+콜백이다. 긴급 매개변수란 다른 것보다 먼저 처리하는 매개변수이고
+콜백은 매개변수 처리 후에 실행되는 것이다. 앞쪽의 필수 매개변수
+때문에 오류 메시지가 나오는 걸 피하기 위해 긴급도가 필요하다.
+예를 들어 ``--version``\이 긴급 매개변수가 아닌데 매개변수
+``--foo``\가 필수이고 먼저 정의돼 있으면 그 매개변수를 지정해
+줘야 ``--version``\이 동작하게 된다. 자세한 내용은
+:ref:`callback-evaluation-order` 참고.
 
-A callback is a function that is invoked with two parameters: the current
-:class:`Context` and the value.  The context provides some useful features
-such as quitting the application and gives access to other already
-processed parameters.
+콜백은 함수이며 현재 :class:`Context` 및 값으로 호출된다.
+문맥을 통해 응용 끝내기 같은 몇 가지 유용한 동작을 이용하고
+이미 처리된 다른 매개변수들에 접근할 수 있다.
 
-Here an example for a ``--version`` flag:
+다음은 ``--version`` 플래그 예시이다.
 
 .. click:example::
 
@@ -489,32 +485,31 @@ Here an example for a ``--version`` flag:
     def hello():
         click.echo('Hello World!')
 
-The `expose_value` parameter prevents the pretty pointless ``version``
-parameter from being passed to the callback.  If that was not specified, a
-boolean would be passed to the `hello` script.  The `resilient_parsing`
-flag is applied to the context if Click wants to parse the command line
-without any destructive behavior that would change the execution flow.  In
-this case, because we would exit the program, we instead do nothing.
+`expose_value` 매개변수는 별 의미 없는 ``version`` 매개변수가
+콜백으로 전달되지 않도록 한다. 지정하지 않으면 `hello` 스크립트로
+불리언 하나가 전달된다. `resilient_parsing` 플래그는 실행 흐름을
+바꿀 파괴적 동작 없이 명령행 파싱을 수행하기를 클릭에서 원할 때
+설정된다. 이 경우 프로그램에서 빠져나가게 될 테니까 설정 시
+아무것도 하지 않는다.
 
-What it looks like:
+다음처럼 된다.
 
 .. click:run::
 
     invoke(hello)
     invoke(hello, args=['--version'])
 
-.. admonition:: Callback Signature Changes
+.. admonition:: 콜백 시그너처 변경
 
-    In Click 2.0 the signature for callbacks changed.  For more
-    information about these changes see :ref:`upgrade-to-2.0`.
+    클릭 2.0에서 콜백 시그너처가 바뀌었다. 이에 대한
+    자세한 내용은 :ref:`upgrade-to-2.0` 참고.
 
-Yes Parameters
---------------
+Yes 매개변수
+------------
 
-For dangerous operations, it's very useful to be able to ask a user for
-confirmation.  This can be done by adding a boolean ``--yes`` flag and
-asking for confirmation if the user did not provide it and to fail in a
-callback:
+위험한 동작에 대해 사용자 확인을 받을 수 있으면 아주 좋을 것이다.
+불리언 플래그 ``--yes``\를 추가하고서 사용자가 그 플래그를 주지
+않으면 콜백이 실패하도록 할 수 있다.
 
 .. click:example::
 
@@ -529,15 +524,15 @@ callback:
     def dropdb():
         click.echo('Dropped all tables!')
 
-And what it looks like on the command line:
+그러면 명령행에서 다음처럼 된다.
 
 .. click:run::
 
     invoke(dropdb, input=['n'])
     invoke(dropdb, args=['--yes'])
 
-Because this combination of parameters is quite common, this can also be
-replaced with the :func:`confirmation_option` decorator:
+매개변수들을 이렇게 조합해 쓰는 게 꽤 흔하기 때문에 대신
+:func:`confirmation_option` 데코레이터를 쓸 수도 있다.
 
 .. click:example::
 
@@ -546,30 +541,29 @@ replaced with the :func:`confirmation_option` decorator:
     def dropdb():
         click.echo('Dropped all tables!')
 
-.. admonition:: Callback Signature Changes
+.. admonition:: 콜백 시그너처 변경
 
-    In Click 2.0 the signature for callbacks changed.  For more
-    information about these changes see :ref:`upgrade-to-2.0`.
+    클릭 2.0에서 콜백 시그너처가 바뀌었다. 이에 대한
+    자세한 내용은 :ref:`upgrade-to-2.0` 참고.
 
-Values from Environment Variables
----------------------------------
+환경 변수에서 값 얻기
+---------------------
 
-A very useful feature of Click is the ability to accept parameters from
-environment variables in addition to regular parameters.  This allows
-tools to be automated much easier.  For instance, you might want to pass
-a configuration file with a ``--config`` parameter but also support exporting
-a ``TOOL_CONFIG=hello.cfg`` key-value pair for a nicer development
-experience.
+클릭에서 유용한 기능으로 정규 매개변수뿐 아니라 환경 변수로부터
+매개변수를 받는 동작이 있다. 이를 통해 도구들을 손쉽게
+자동화할 수 있다. 예를 들어 설정 파일을 ``--config`` 매개변수로
+줄 수도 있겠지만 더 편한 개발을 위해 ``TOOL_CONFIG=hello.cfg``
+처럼 키-값 쌍으로 지정할 수도 있을 것이다.
 
-This is supported by Click in two ways.  One is to automatically build
-environment variables which is supported for options only.  To enable this
-feature, the ``auto_envvar_prefix`` parameter needs to be passed to the
-script that is invoked.  Each command and parameter is then added as an
-uppercase underscore-separated variable.  If you have a subcommand
-called ``foo`` taking an option called ``bar`` and the prefix is
-``MY_TOOL``, then the variable is ``MY_TOOL_FOO_BAR``.
+클릭에서는 두 가지 방식을 지원한다. 하나는 환경 변수를 자동으로
+구성해 주는 방식으로, 옵션에서만 가능하다. 이 기능을 켜려면
+스크립트를 호출할 때 ``auto_envvar_prefix`` 매개변수를 줘야 한다.
+그러면 각 명령 및 매개변수에 대해 밑줄로 구분된 대문자 변수가
+추가된다. 가령 ``foo``\라는 하위 명령이 있어서 ``bar``\라는
+옵션을 받으며 접두 문자열이 ``MY_TOOL``\이라면 변수는
+``MY_TOOL_FOO_BAR``\가 된다.
 
-Example usage:
+사용례:
 
 .. click:example::
 
@@ -581,17 +575,18 @@ Example usage:
     if __name__ == '__main__':
         greet(auto_envvar_prefix='GREETER')
 
-And from the command line:
+명령행:
 
 .. click:run::
 
     invoke(greet, env={'GREETER_USERNAME': 'john'},
            auto_envvar_prefix='GREETER')
 
-When using ``auto_envvar_prefix`` with command groups, the command name needs
-to be included in the environment variable, between the prefix and the parameter name, *i.e.* *PREFIX_COMMAND_VARIABLE*.
+명령 그룹에 ``auto_envvar_prefix``\를 쓸 때는 환경 변수의
+접두 문자열과 매개변수 이름 사이에 명령 이름이 들어가야 한다.
+즉 *PREFIX_COMMAND_VARIABLE*\이다.
 
-Example:
+예:
 
 .. click:example::
 
@@ -615,10 +610,10 @@ Example:
           auto_envvar_prefix='GREETER')
 
 
-The second option is to manually pull values in from specific environment
-variables by defining the name of the environment variable on the option.
+두 번째 방식은 옵션에 환경 변수 이름을 지정해서 직접 특정
+환경 변수의 값을 가져오는 방식이다.
 
-Example usage:
+사용례:
 
 .. click:example::
 
@@ -630,32 +625,32 @@ Example usage:
     if __name__ == '__main__':
         greet()
 
-And from the command line:
+명령행:
 
 .. click:run::
 
     invoke(greet, env={'USERNAME': 'john'})
 
-In that case it can also be a list of different environment variables
-where the first one is picked.
+이 경우 여러 환경 변수들의 목록을 쓸 수도 있으며 그러면
+첫 번째로 있는 값을 가져온다.
 
-Multiple Values from Environment Values
----------------------------------------
+환경 값에서 여러 값 얻기
+------------------------
 
-As options can accept multiple values, pulling in such values from
-environment variables (which are strings) is a bit more complex.  The way
-Click solves this is by leaving it up to the type to customize this
-behavior.  For both ``multiple`` and ``nargs`` with values other than
-``1``, Click will invoke the :meth:`ParamType.split_envvar_value` method to
-perform the splitting.
+옵션에서 여러 값을 받을 수 있을 때 (문자열인) 환경 변수에서
+여러 값을 가져오는 건 좀 더 복잡하다. 클릭에서는 각 타입에서
+적당한 방식으로 동작하게 맡기는 방식으로 이 문제를 해결한다.
+``multiple``\이나 ``1`` 아닌 ``nargs``\가 있을 때 클릭에서
+:meth:`ParamType.split_envvar_value` 메소드를 호출해서
+분리를 수행하게 된다.
 
-The default implementation for all types is to split on whitespace.  The
-exceptions to this rule are the :class:`File` and :class:`Path` types
-which both split according to the operating system's path splitting rules.
-On Unix systems like Linux and OS X, the splitting happens for those on
-every colon (``:``), and for Windows, on every semicolon (``;``).
+모든 타입에서 기본 구현은 공백에서 나누는 것이다. 단 예외로
+:class:`File` 및 :class:`Path` 타입은 운영 체제의 경로 분리
+규칙에 따라 나눈다. 리눅스나 OS X 같은 유닉스 시스템에서는
+콜론(``:``)에서 분리가 일어나고 윈도우에서는
+세미콜론(``;``)에서 일어난다.
 
-Example usage:
+사용례:
 
 .. click:example::
 
@@ -669,21 +664,21 @@ Example usage:
     if __name__ == '__main__':
         perform()
 
-And from the command line:
+명령행:
 
 .. click:run::
 
     import os
     invoke(perform, env={'PATHS': './foo/bar%s./test' % os.path.pathsep})
 
-Other Prefix Characters
------------------------
+다른 시작 문자
+--------------
 
-Click can deal with alternative prefix characters other than ``-`` for
-options.  This is for instance useful if you want to handle slashes as
-parameters ``/`` or something similar.  Note that this is strongly
-discouraged in general because Click wants developers to stay close to
-POSIX semantics.  However in certain situations this can be useful:
+클릭에서는 앞에 ``-`` 대신 다른 문자를 쓰는 옵션을 다룰 수 있다.
+예를 들어 슬래시를 매개변수 ``/``\로나 그 비슷하게 처리하고 싶을
+때 유용하다. 참고로 일반적으로 가능하면 그렇게 하지 않는 게 좋다.
+클릭에서는 개발자들이 POSIX 동작 방식과 비슷하게 하길 바라기
+때문이다. 하지만 어떤 경우에는 이게 유용할 수도 있다.
 
 .. click:example::
 
@@ -695,15 +690,15 @@ POSIX semantics.  However in certain situations this can be useful:
     if __name__ == '__main__':
         chmod()
 
-And from the command line:
+명령행:
 
 .. click:run::
 
     invoke(chmod, args=['+w'])
     invoke(chmod, args=['-w'])
 
-Note that if you are using ``/`` as prefix character and you want to use a
-boolean flag you need to separate it with ``;`` instead of ``/``:
+참고로 접두 문자로 ``/``\를 쓰고 있을 때 불리언 플래그를 사용하고
+싶으면 ``/`` 대신 ``;``\로 분리해 줘야 한다.
 
 .. click:example::
 
@@ -717,21 +712,20 @@ boolean flag you need to separate it with ``;`` instead of ``/``:
 
 .. _ranges:
 
-Range Options
--------------
+범위 옵션
+---------
 
-A special mention should go to the :class:`IntRange` type, which works very
-similarly to the :data:`INT` type, but restricts the value to fall into a
-specific range (inclusive on both edges).  It has two modes:
+:class:`IntRange` 타입은 따로 언급할 필요가 있다. 이 타입은
+:data:`INT` 타입과 아주 비슷하게 동작하되 그 값을 (양쪽 경계를
+포함하는) 특정 범위로 제약한다. 두 가지 동작 모드가 있다.
 
--   the default mode (non-clamping mode) where a value that falls outside
-    of the range will cause an error.
--   an optional clamping mode where a value that falls outside of the
-    range will be clamped.  This means that a range of ``0-5`` would
-    return ``5`` for the value ``10`` or ``0`` for the value ``-1`` (for
-    example).
+-   기본 모드(안 자르기 모드)에서는 값이 범위를 벗어나면 오류를
+    일으킨다.
+-   선택적인 자르기 모드에서는 값이 범위를 벗어나면 잘리게
+    된다. 즉 (예를 들어) 범위가 ``0-5``\일 때 ``10`` 값은
+    ``5``\를 반환하고 ``-1`` 값은 ``0``\을 반환하게 된다.
 
-Example:
+예:
 
 .. click:example::
 
@@ -744,31 +738,30 @@ Example:
     if __name__ == '__main__':
         repeat()
 
-And from the command line:
+명령행:
 
 .. click:run::
 
     invoke(repeat, args=['--count=1000', '--digit=5'])
     invoke(repeat, args=['--count=1000', '--digit=12'])
 
-If you pass ``None`` for any of the edges, it means that the range is open
-at that side.
+경계 중 어느 쪽에든 ``None``\을 주면 범위 그쪽이 열려 있다는
+뜻이다.
 
-Callbacks for Validation
-------------------------
+검증 콜백
+---------
 
 .. versionchanged:: 2.0
 
-If you want to apply custom validation logic, you can do this in the
-parameter callbacks.  These callbacks can both modify values as well as
-raise errors if the validation does not work.
+별도의 검증 로직을 적용하고 싶다면 매개변수 콜백에서 하면 된다.
+그 콜백은 검증이 실패했을 때 오류를 던질 수 있을 뿐 아니라
+값을 변경할 수도 있다.
 
-In Click 1.0, you can only raise the :exc:`UsageError` but starting with
-Click 2.0, you can also raise the :exc:`BadParameter` error, which has the
-added advantage that it will automatically format the error message to
-also contain the parameter name.
+클릭 1.0에서는 :exc:`UsageError`\만 던질 수 있지만 클릭 2.0부터는
+:exc:`BadParameter`\도 던질 수 있는데, 자동으로 매개변수 이름을
+포함한 오류 메시지를 만들어 준다는 장점이 있다.
 
-Example:
+예:
 
 .. click:example::
 
@@ -787,7 +780,7 @@ Example:
     if __name__ == '__main__':
         roll()
 
-And what it looks like:
+그러면 다음처럼 된다.
 
 .. click:run::
 
