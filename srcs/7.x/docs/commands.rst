@@ -1,24 +1,22 @@
-Commands and Groups
-===================
+명령과 그룹
+===========
 
 .. currentmodule:: click
 
-The most important feature of Click is the concept of arbitrarily nesting
-command line utilities.  This is implemented through the :class:`Command`
-and :class:`Group` (actually :class:`MultiCommand`).
+클릭의 가장 중요한 기능은 명령행 도구들의 계층 구조를 마음대로
+만들 수 있다는 것이다. :class:`Command`\와 :class:`Group`
+(:class:`MultiCommand`)를 통해 구현한다.
 
-Callback Invocation
--------------------
+콜백 호출
+---------
 
-For a regular command, the callback is executed whenever the command runs.
-If the script is the only command, it will always fire (unless a parameter
-callback prevents it.  This for instance happens if someone passes
-``--help`` to the script).
+일반 명령에서는 명령이 실행될 때마다 콜백이 실행된다. 스크립트에
+명령이 유일하면 매번 호출된다. (매개변수 콜백에서 막는 경우는
+예외이다. 예를 들어 스크립트에 ``--help``\를 주는 경우가 그렇다.)
 
-For groups and multi commands, the situation looks different.  In this case,
-the callback fires whenever a subcommand fires (unless this behavior is
-changed).  What this means in practice is that an outer command runs
-when an inner command runs:
+그룹 및 다중 명령에서는 상황이 달라진다. 그 경우에는 (동작 방식을
+바꾸지 않았다면) 하위 명령이 불릴 때마다 콜백이 불린다. 이게
+무슨 뜻이냐면 내부 명령이 실행될 때 외부 명령도 실행된다는 것이다.
 
 .. click:example::
 
@@ -31,7 +29,7 @@ when an inner command runs:
     def sync():
         click.echo('Syncing')
 
-Here is what this looks like:
+다음처럼 된다.
 
 .. click:run::
 
@@ -39,47 +37,49 @@ Here is what this looks like:
     println()
     invoke(cli, prog_name='tool.py', args=['--debug', 'sync'])
 
-Passing Parameters
-------------------
+매개변수 전달
+-------------
 
-Click strictly separates parameters between commands and subcommands. What this
-means is that options and arguments for a specific command have to be specified
-*after* the command name itself, but *before* any other command names.
+클릭에서는 명령과 하위 명령 간에 매개변수를 엄격하게 구분한다.
+이게 무슨 뜻이냐면 어떤 명령에 대한 옵션과 인자는 그 명령 이름
+*뒤에*, 그리고 다음 명령이 있다면 그 명령 이름 *앞에* 지정해야
+한다는 것이다.
 
-This behavior is already observable with the predefined ``--help`` option.
-Suppose we have a program called ``tool.py``, containing a subcommand called
-``sub``.
+이미 정의돼 있는 ``--help`` 옵션에서도 이 동작을 볼 수 있다.
+가령 ``tool.py``\라는 프로그램이 있고 거기에 ``sub``\라는
+하위 명령이 있다고 하자.
 
-- ``tool.py --help`` will return the help for the whole program (listing
-  subcommands).
+- ``tool.py --help``\라고 하면 프로그램 전체의 (하위 명령들을
+  나열하는) 도움말이 나온다.
 
-- ``tool.py sub --help`` will return the help for the ``sub`` subcommand.
+- ``tool.py sub --help``\라고 하면 하위 명령 ``sub``\의 도움말이
+  나온다.
 
-- But ``tool.py --help sub`` will treat ``--help`` as an argument for the main
-  program. Click then invokes the callback for ``--help``, which prints the
-  help and aborts the program before click can process the subcommand.
+- 하지만 ``tool.py --help sub``\라고 하면 ``--help``\를 주
+  프로그램의 인자로 취급한다. 그럼 클릭에서 ``--help``\의 콜백을
+  호출하고, 그러면 도움말을 찍고서 프로그램을 중단한다. 그래서
+  하위 명령은 처리하지 못한다.
 
-Nested Handling and Contexts
-----------------------------
+계층 처리와 문맥
+-----------------
 
-As you can see from the earlier example, the basic command group accepts a
-debug argument which is passed to its callback, but not to the sync
-command itself.  The sync command only accepts its own arguments.
+앞선 예에서 볼 수 있듯 기본 명령 그룹은 콜백으로 전달되는 debug
+인자를 받지만 sync 명령은 받지 못한다. sync 명령은 자체 인자만
+받는다.
 
-This allows tools to act completely independent of each other, but how
-does one command talk to a nested one?  The answer to this is the
-:class:`Context`.
+덕분에 도구들이 서로 완전히 독립적으로 동작할 수 있다. 하지만
+어떤 명령에서 하위 명령으로 뭔가를 전달하려면 어떡해야 할까?
+답은 :class:`Context`\다.
 
-Each time a command is invoked, a new context is created and linked with the
-parent context.  Normally, you can't see these contexts, but they are
-there.  Contexts are passed to parameter callbacks together with the
-value automatically.  Commands can also ask for the context to be passed
-by marking themselves with the :func:`pass_context` decorator.  In that
-case, the context is passed as first argument.
+명령이 호출될 때마다 새 문맥이 생성돼서 부모 문맥에 연결된다.
+보통은 그 문맥들을 볼 수 없지만 분명 그렇게 존재한다.
+문맥은 매개변수 콜백에 자동으로 값과 함께 전달된다.
+그리고 명령에서도 :func:`pass_context` 데코레이터로 표시를
+해서 문맥을 전달받을 수 있다. 그 경우 문맥이 첫 번째 인자로
+전달된다.
 
-The context can also carry a program specified object that can be
-used for the program's purposes.  What this means is that you can build a
-script like this:
+문맥은 프로그램 자체 용도를 위한 프로그램 지정 객체를
+가지고 있을 수 있다. 즉 다음처럼 스크립트를 만들 수 있다.
 
 .. click:example::
 
@@ -87,8 +87,8 @@ script like this:
     @click.option('--debug/--no-debug', default=False)
     @click.pass_context
     def cli(ctx, debug):
-        # ensure that ctx.obj exists and is a dict (in case `cli()` is called
-        # by means other than the `if` block below
+        # ctx.obj가 존재하는지, 그리고 dict인지 (아래의 `if` 블록
+        # 아닌 경로로 `cli()`가 호출되는 경우 대비) 확인한다
         ctx.ensure_object(dict)
 
         ctx.obj['DEBUG'] = debug
@@ -101,30 +101,29 @@ script like this:
     if __name__ == '__main__':
         cli(obj={})
 
-If the object is provided, each context will pass the object onwards to
-its children, but at any level a context's object can be overridden.  To
-reach to a parent, ``context.parent`` can be used.
+객체가 제공되면 각 문맥에서 그 객체를 자식들로 계속 전달한다.
+단 어느 단계에서든 문맥의 객체를 바꿀 수 있다. 부모 문맥에
+접근하려면 ``context.parent``\를 이용하면 된다.
 
-In addition to that, instead of passing an object down, nothing stops the
-application from modifying global state.  For instance, you could just flip
-a global ``DEBUG`` variable and be done with it.
+추가로, 객체를 내려 주는 방식 대신 응용에서 전역 상태를 변경하는
+것도 얼마든 가능하다. 예를 들어 그냥 전역의 ``DEBUG`` 변수를
+바꾸는 식으로 할 수도 있다.
 
-Decorating Commands
--------------------
+명령 데코레이터
+---------------
 
-As you have seen in the earlier example, a decorator can change how a
-command is invoked.  What actually happens behind the scenes is that
-callbacks are always invoked through the :meth:`Context.invoke` method
-which automatically invokes a command correctly (by either passing the
-context or not).
+앞선 예에서 본 것처럼 데코레이터를 써서 명령이 호출되는 방식을
+바꿀 수 있다. 배후에서 실제 일어나는 동작은 콜백은 항상
+:meth:`Context.invoke` 메소드를 통해 호출되고 그 메소드에서
+자동으로 명령을 올바르게 (문맥을 전달하며, 또는 하지 않으며)
+호출하는 것이다.
 
-This is very useful when you want to write custom decorators.  For
-instance, a common pattern would be to configure an object representing
-state and then storing it on the context and then to use a custom
-decorator to find the most recent object of this sort and pass it as first
-argument.
+이게 유용한 건 새로운 데코레이터를 작성하고 싶을 때다. 예를 들어
+흔한 패턴으로 상태를 나타내는 객체를 구성해서 문맥에 저장해 둔
+다음 새로운 데코레이터를 사용해 그런 최근 객체를 첫 번째 인자로
+전달해 주는 방식이 있다.
 
-For instance, the :func:`pass_obj` decorator can be implemented like this:
+예를 들어 :func:`pass_obj` 데코레이터를 다음처럼 구현할 수 있다.
 
 .. click:example::
 
@@ -136,27 +135,25 @@ For instance, the :func:`pass_obj` decorator can be implemented like this:
             return ctx.invoke(f, ctx.obj, *args, **kwargs)
         return update_wrapper(new_func, f)
 
-The :meth:`Context.invoke` command will automatically invoke the function
-in the correct way, so the function will either be called with ``f(ctx,
-obj)`` or ``f(obj)`` depending on whether or not it itself is decorated with
-:func:`pass_context`.
+:meth:`Context.invoke`\에서 함수를 올바른 방식으로 호출해 준다.
+즉 :func:`pass_context`\로 꾸며 줬는지 여부에 따라 함수가
+``f(ctx, obj)``\나 ``f(obj)`` 중 하나로 호출된다.
 
-This is a very powerful concept that can be used to build very complex
-nested applications; see :ref:`complex-guide` for more information.
+이 강력한 개념을 이용하면 아주 복잡한 중첩 응용을 만들 수 있다.
+자세한 내용은 :ref:`complex-guide` 참고.
 
 
-Group Invocation Without Command
---------------------------------
+명령 없이 그룹 호출하기
+-----------------------
 
-By default, a group or multi command is not invoked unless a subcommand is
-passed.  In fact, not providing a command automatically passes ``--help``
-by default.  This behavior can be changed by passing
-``invoke_without_command=True`` to a group.  In that case, the callback is
-always invoked instead of showing the help page.  The context object also
-includes information about whether or not the invocation would go to a
-subcommand.
+기본적으로 그룹 내지 다중 명령은 하위 명령을 주지 않는 한 호출되지
+않는다. 실제로 명령을 주지 않으면 기본적으로 ``--help``\가 자동으로
+들어간다. 이 동작 방식을 바꾸려면 그룹에
+``invoke_without_command=True``\를 주면 된다. 그러면 도움말
+페이지를 보이는 대신 항상 콜백을 호출한다. 그리고 문맥 객체에는
+호출이 하위 명령으로 가게 되는지 여부에 대한 정보가 들어 있다.
 
-Example:
+예:
 
 .. click:example::
 
@@ -172,7 +169,7 @@ Example:
     def sync():
         click.echo('The subcommand')
 
-And how it works in practice:
+그러면 실제로 다음처럼 된다.
 
 .. click:run::
 
@@ -181,14 +178,14 @@ And how it works in practice:
 
 .. _custom-multi-commands:
 
-Custom Multi Commands
----------------------
+새로운 다중 명령
+----------------
 
-In addition to using :func:`click.group`, you can also build your own
-custom multi commands.  This is useful when you want to support commands
-being loaded lazily from plugins.
+:func:`click.group`\을 쓰는 대신 자체적으로 새로운 다중 명령을
+만들 수도 있다. 필요할 때 플러그인의 명령들을 적재하는 걸
+지원하려 할 때 유용하다.
 
-A custom multi command just needs to implement a list and load method:
+새로운 다중 명령에는 나열 메소드와 적재 메소드만 구현해 주면 된다.
 
 .. click:example::
 
@@ -221,7 +218,7 @@ A custom multi command just needs to implement a list and load method:
     if __name__ == '__main__':
         cli()
 
-These custom classes can also be used with decorators:
+이 새 클래스를 데코레이터에 쓸 수도 있다.
 
 .. click:example::
 
@@ -229,19 +226,19 @@ These custom classes can also be used with decorators:
     def cli():
         pass
 
-Merging Multi Commands
-----------------------
+다중 명령 병합
+--------------
 
-In addition to implementing custom multi commands, it can also be
-interesting to merge multiple together into one script.  While this is
-generally not as recommended as it nests one below the other, the merging
-approach can be useful in some circumstances for a nicer shell experience.
+새로운 다중 명령을 구현하는 것에 못지 않게 여러 스크립트를
+하나로 합치는 것도 눈여겨 볼 만하다. 일반적으로는 한쪽을
+다른 쪽 아래에 두는 방식을 더 권장하지만 어떤 경우에는
+합치는 방식을 써서 더 편한 셸 사용 경험을 제공할 수 있다.
 
-The default implementation for such a merging system is the
-:class:`CommandCollection` class.  It accepts a list of other multi
-commands and makes the commands available on the same level.
+그런 병합 방식의 기본 구현체가 :class:`CommandCollection`
+클래스다. 다른 다중 명령들의 목록을 받아서 그 명령들을
+같은 단계에서 사용할 수 있게 만들어 준다.
 
-Example usage:
+사용례:
 
 .. click:example::
 
@@ -268,28 +265,29 @@ Example usage:
     if __name__ == '__main__':
         cli()
 
-And what it looks like:
+그러면 다음처럼 된다.
 
 .. click:run::
 
     invoke(cli, prog_name='cli', args=['--help'])
 
-In case a command exists in more than one source, the first source wins.
+한 명령이 여러 곳에 존재하는 경우에는 처음 나온 곳의 명령을 쓴다.
 
 
 .. _multi-command-chaining:
 
-Multi Command Chaining
-----------------------
+다중 명령 연속 지정
+-------------------
 
 .. versionadded:: 3.0
 
-Sometimes it is useful to be allowed to invoke more than one subcommand in
-one go.  For instance if you have installed a setuptools package before
-you might be familiar with the ``setup.py sdist bdist_wheel upload``
-command chain which invokes ``dist`` before ``bdist_wheel`` before
-``upload``.  Starting with Click 3.0 this is very simple to implement.
-All you have to do is to pass ``chain=True`` to your multicommand:
+한 번에 여러 하위 명령을 호출하는 게 가능하면 좋을 때가 있다.
+예를 들어 이전에 setuptools 패키지를 설치해 본 적이 있다면
+``setup.py sdist bdist_wheel upload``\라는 연속 명령에 익숙할
+것이다. 이 명령은 ``sdist`` 다음에 ``bdist_wheel``\을, 그리고
+``upload``\를 차례로 호출한다. 클릭 3.0부터는 이걸 아주
+간편하게 구현할 수 있다. 다중 명령에 ``chain=True``\를
+주기만 하면 된다.
 
 .. click:example::
 
@@ -307,53 +305,51 @@ All you have to do is to pass ``chain=True`` to your multicommand:
     def bdist_wheel():
         click.echo('bdist_wheel called')
 
-Now you can invoke it like this:
+그러면 다음처럼 호출할 수 있다.
 
 .. click:run::
 
     invoke(cli, prog_name='setup.py', args=['sdist', 'bdist_wheel'])
 
-When using multi command chaining you can only have one command (the last)
-use ``nargs=-1`` on an argument.  It is also not possible to nest multi
-commands below chained multicommands.  Other than that there are no
-restrictions on how they work.  They can accept options and arguments as
-normal.
+연속 다중 명령 방식을 쓸 때는 (마지막의) 한 명령에서만 인자에
+``nargs=-1``\을 쓸 수 있다. 또한 연속 다중 명령 아래에 다른 다중
+명령을 넣는 게 불가능하다. 그 외에는 동작 방식에 어떤 제약도 없다.
+다른 경우들처럼 옵션과 인자를 받을 수 있다.
 
-Another note: the :attr:`Context.invoked_subcommand` attribute is a bit
-useless for multi commands as it will give ``'*'`` as value if more than
-one command is invoked.  This is necessary because the handling of
-subcommands happens one after another so the exact subcommands that will
-be handled are not yet available when the callback fires.
+추가 참고 사항: 다중 명령에서 여러 명령을 호출할 때는
+:attr:`Context.invoked_subcommand` 속성에 ``'*'`` 값이
+들어가므로 별 쓸모가 없다. 이는 하위 명령 처리가 하나씩 차례로
+이뤼지기 때문에 콜백 발화 시에는 정확히 어떤 하위 명령이
+처리될지 알 수 없기 때문이다.
 
 .. note::
 
-    It is currently not possible for chain commands to be nested.  This
-    will be fixed in future versions of Click.
+    현재는 연속 명령들에 하위 명령을 넣는 게 불가능하다. 클릭
+    향후 버전에서 고쳐질 예정이다.
 
 
-Multi Command Pipelines
------------------------
+다중 명령 파이프라인
+--------------------
 
 .. versionadded:: 3.0
 
-A very common usecase of multi command chaining is to have one command
-process the result of the previous command.  There are various ways in
-which this can be facilitated.  The most obvious way is to store a value
-on the context object and process it from function to function.  This
-works by decorating a function with :func:`pass_context` after which the
-context object is provided and a subcommand can store its data there.
+연속 다중 명령을 사용하는 아주 흔한 경우는 한 명령이 앞 명령의
+결과를 처리하게 하는 것이다. 이를 가능하게 해 주는 방법들이
+여러 가지 있다. 쉽게 떠오르는 걸로는 문맥 객체에 값을 저장해서
+함수를 넘나들며 그 값을 처리하는 방법이 있다. 함수를
+:func:`pass_context`\로 꾸며 주면 문맥 객체가 제공되므로
+하위 명령에서 거기에 데이터를 저장할 수 있게 된다.
 
-Another way to accomplish this is to setup pipelines by returning
-processing functions.  Think of it like this: when a subcommand gets
-invoked it processes all of its parameters and comes up with a plan of
-how to do its processing.  At that point it then returns a processing
-function and returns.
+또 다른 방법은 처리 함수를 반환하게 해서 파이프라인을 구성하는
+것이다. 말하자면, 하위 명령을 호출하면 거기선 매개변수들을 모두
+처리하고서 어떻게 처리를 수행할지 계획을 세운다. 그러고 나면
+그 처리 함수를 반환하며 돌아오는 것이다.
 
-Where do the returned functions go?  The chained multicommand can register
-a callback with :meth:`MultiCommand.resultcallback` that goes over all
-these functions and then invoke them.
+그럼 반환된 그 함수들은 어디로 가는 걸까? 연속 다중 명령에서는
+:meth:`MultiCommand.resultcallback`\으로 콜백을 등록할 수 있는데
+거기서 그 함수들을 모두 훑으며 호출한다.
 
-To make this a bit more concrete consider this example:
+좀 더 구체적으로 보자면 다음 예를 생각해 보자.
 
 .. click:example::
 
@@ -391,60 +387,56 @@ To make this a bit more concrete consider this example:
                 yield line.strip()
         return processor
 
-That's a lot in one go, so let's go through it step by step.
+설명할 게 좀 많다. 하나씩 살펴보자.
 
-1.  The first thing is to make a :func:`group` that is chainable.  In
-    addition to that we also instruct Click to invoke even if no
-    subcommand is defined.  If this would not be done, then invoking an
-    empty pipeline would produce the help page instead of running the
-    result callbacks.
-2.  The next thing we do is to register a result callback on our group.
-    This callback will be invoked with an argument which is the list of
-    all return values of all subcommands and then the same keyword
-    parameters as our group itself.  This means we can access the input
-    file easily there without having to use the context object.
-3.  In this result callback we create an iterator of all the lines in the
-    input file and then pass this iterator through all the returned
-    callbacks from all subcommands and finally we print all lines to
-    stdout.
+1.  첫 번째로 할 일은 명령 연속 지정이 가능한 :func:`group`\을
+    만드는 것이다. 그리고 하위 명령이 지정되지 않더라도 클릭에서
+    호출하도록 한다. 이렇게 하지 않으면 빈 파이프라인 호출 시에
+    결과 콜백을 실행하는 대신 도움말 페이지를 내놓게 된다.
+2.  다음으로 할 일은 그룹에 결과 콜백을 등록하는 것이다. 그러면
+    모든 하위 명령의 반환 값들, 그리고 그룹 자체가 받은 것과
+    같은 키워드 매개변수들을 인자로 해서 그 콜백이 호출된다.
+    즉 문맥 객체를 쓰지 않아도 거기서 입력 파일에 쉽게 접근할
+    수 있다.
+3.  그 결과 콜백 내에서는 입력 파일의 모든 행으로 이터레이터를
+    만들고 하위 명령에서 반환한 콜백 모두를 이터레이터가 거치게
+    하고서 모든 행을 stdout으로 찍는다.
 
-After that point we can register as many subcommands as we want and each
-subcommand can return a processor function to modify the stream of lines.
+이렇게 한 다음에는 원하는 대로 하위 명령들을 등록할 수 있으며
+각 하위 명령에서는 행 스트림을 변경하는 처리 함수를 반환하면 된다.
 
-One important thing of note is that Click shuts down the context after
-each callback has been run.  This means that for instance file types
-cannot be accessed in the `processor` functions as the files will already
-be closed there.  This limitation is unlikely to change because it would
-make resource handling much more complicated.  For such it's recommended
-to not use the file type and manually open the file through
-:func:`open_file`.
+주의할 점 하나는 각 콜백이 실행된 후에 클릭에서 문맥을 없앤다는
+것이다. 그래서 예를 들면 파일 타입을 `processor` 함수 안에서
+접근할 수 없다. 거기선 파일이 이미 닫혀 있기 때문이다.
+이런 제한은 자원 관리를 훨씬 단순하게 해 주기 때문에 아마
+바뀌지 않을 것이다. 따라서 파일 타입을 쓰는 대신 직접
+:func:`open_file`\을 통해 파일을 열기를 권한다.
 
-For a more complex example that also improves upon handling of the
-pipelines have a look at the `imagepipe multi command chaining demo
-<https://github.com/pallets/click/tree/master/examples/imagepipe>`__ in
-the Click repository.  It implements a pipeline based image editing tool
-that has a nice internal structure for the pipelines.
+파이프라인 처리 방식도 개선한 더 복잡한 예를 클릭 저장소의
+`imagepipe 연속 다중 명령 예시
+<https://github.com/pallets/click/tree/master/examples/imagepipe>`__\에서
+볼 수 있다. 파이프라인 기반으로 이미지 편집 툴을 구현한 것인데
+내부 구조가 파이프라인에 잘 맞게 돼 있다.
 
 
-Overriding Defaults
--------------------
+기본값 바꾸기
+-------------
 
-By default, the default value for a parameter is pulled from the
-``default`` flag that is provided when it's defined, but that's not the
-only place defaults can be loaded from.  The other place is the
-:attr:`Context.default_map` (a dictionary) on the context.  This allows
-defaults to be loaded from a configuration file to override the regular
-defaults.
+기본적으로 매개변수의 기본값은 그 매개변수를 정의할 때 준
+``default`` 플래그에서 가져오지만 거기서만 가져오는 건
+아니다. 문맥의 :attr:`Context.default_map`\(딕셔너리)에서도
+기본값을 가져온다. 이를 이용하면 설정 파일에서 기본값을
+읽어 들여서 정규 기본값을 교체할 수 있다.
 
-This is useful if you plug in some commands from another package but
-you're not satisfied with the defaults.
+다른 패키지에서 어떤 명령들을 플러그인 형태로 가져오려는데
+기본값은 마음에 들지 않을 때 유용하다.
 
-The default map can be nested arbitrarily for each subcommand and
-provided when the script is invoked.  Alternatively, it can also be
-overridden at any point by commands.  For instance, a top-level command could
-load the defaults from a configuration file.
+각 하위 명령에 맞춰 필요한 대로 기본값 맵의 계층을 만들어서
+스크립트 호출 시 제공할 수 있다. 또는 명령 어느 지점에서든
+기본값을 교체할 수도 있다. 예를 들어 최상위 명령에서
+설정 파일에 있는 기본값을 읽어 들일 수 있을 것이다.
 
-Example usage:
+사용례:
 
 .. click:example::
 
@@ -466,7 +458,7 @@ Example usage:
             }
         })
 
-And in action:
+동작시켜 보면:
 
 .. click:run::
 
@@ -476,17 +468,17 @@ And in action:
         }
     })
 
-Context Defaults
-----------------
+문맥 기본값
+-----------
 
 .. versionadded:: 2.0
 
-Starting with Click 2.0 you can override defaults for contexts not just
-when calling your script, but also in the decorator that declares a
-command.  For instance given the previous example which defines a custom
-``default_map`` this can also be accomplished in the decorator now.
+클릭 2.0부터는 스크립트를 호출할 때만이 아니라 명령을 선언하는
+데코레이터에서도 문맥의 기본값을 교체할 수 있다. 예를 들어
+따로 ``default_map``\을 정의하는 앞선 예가 있을 때 그걸
+데코레이터에서도 할 수 있다.
 
-This example does the same as the previous example:
+다음 예는 앞선 예와 같이 동작한다.
 
 .. click:example::
 
@@ -508,55 +500,52 @@ This example does the same as the previous example:
     if __name__ == '__main__':
         cli()
 
-And again the example in action:
+마찬가지로 동작시켜 보면:
 
 .. click:run::
 
     invoke(cli, prog_name='cli', args=['runserver'])
 
 
-Command Return Values
----------------------
+명령 반환 값
+------------
 
 .. versionadded:: 3.0
 
-One of the new introductions in Click 3.0 is the full support for return
-values from command callbacks.  This enables a whole range of features
-that were previously hard to implement.
+클릭 3.0에서 새로 도입된 것 중 하나는 명령 콜백 반환값을 제대로
+지원하는 것이다. 이를 이용하면 이전에는 구현하기 힘들었던 여러
+기능들이 가능해진다.
 
-In essence any command callback can now return a value.  This return value
-is bubbled to certain receivers.  One usecase for this has already been
-show in the example of :ref:`multi-command-chaining` where it has been
-demonstrated that chained multi commands can have callbacks that process
-all return values.
+기본적으로 이제 어떤 명령 콜백에서도 값을 반환할 수 있다. 그
+반환 값은 특정 수신자에게로 흘러간다. 이를 이용하는 사례를
+:ref:`multi-command-chaining`\의 예에서 이미 보았다. 거기서
+본 것처럼 반환 값들을 연속 다중 명령의 콜백에서 처리할 수 있다.
 
-When working with command return values in Click, this is what you need to
-know:
+클릭에서 명령 반환 값을 다룰 때 다음 사항들을 유념해야 한다.
 
--   The return value of a command callback is generally returned from the
-    :meth:`BaseCommand.invoke` method.  The exception to this rule has to
-    do with :class:`Group`\s:
+-   명령 콜백의 반환 값은 일반적으로 :meth:`BaseCommand.invoke`
+    메소드에서 반환된다. 이 규칙에 대한 예외는 :class:`Group`\과
+    관련돼 있다.
 
-    *   In a group the return value is generally the return value of the
-        subcommand invoked.  The only exception to this rule is that the
-        return value is the return value of the group callback if it's
-        invoked without arguments and `invoke_without_command` is enabled.
-    *   If a group is set up for chaining then the return value is a list
-        of all subcommands' results.
-    *   Return values of groups can be processed through a
-        :attr:`MultiCommand.result_callback`.  This is invoked with the
-        list of all return values in chain mode, or the single return
-        value in case of non chained commands.
+    *   그룹에서 반환 값은 일반적으로 호출된 하위 명령의
+        반환 값이다. 이 규칙의 유일한 예외로 인자 없이 호출됐고
+        `invoke_without_command`\가 켜져 있으면 그룹 콜백의
+        반환 값이 반환 값이다.
+    *   그룹이 연속 지정 설정이 돼 있으면 모든 하위 명령
+        결과들의 리스트가 반환 값이다.
+    *   그룹의 반환 값을 :attr:`MultiCommand.result_callback`\을
+        통해 처리할 수 있다. 연속 모드에서는 모든 반환 값들의
+        리스트로, 아닌 경우에는 반환 값 하나로 호출된다.
 
--   The return value is bubbled through from the :meth:`Context.invoke`
-    and :meth:`Context.forward` methods.  This is useful in situations
-    where you internally want to call into another command.
+-   :meth:`Context.invoke` 및 :meth:`Context.forward` 메소드부터
+    시작해서 반환 값이 흘러간다. 내부적으로 다른 명령을 호출하고
+    싶은 경우에 유용하다.
 
--   Click does not have any hard requirements for the return values and
-    does not use them itself.  This allows return values to be used for
-    custom decorators or workflows (like in the multi command chaining
-    example).
+-   클릭에선 반환 값에 대해 어떤 뚜렷한 요구 조건도 없으며 반환
+    값을 자체적으로 사용하지 않는다. 그래서 반환 값을 자체
+    데코레이터나 (다중 명령 연속 지정 예시에서와 같은) 처리
+    흐름에서 이용하는 게 가능하다.
 
--   When a Click script is invoked as command line application (through
-    :meth:`BaseCommand.main`) the return value is ignored unless the
-    `standalone_mode` is disabled in which case it's bubbled through.
+-   클릭 스크립트가 (:meth:`BaseCommand.main`\을 통해) 명령행
+    응용으로 호출될 때는 그 반환 값이 무시된다. 단
+    `standalone_mode`\가 꺼져 있는 경우에는 전달된다.
