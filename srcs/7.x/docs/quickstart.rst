@@ -236,7 +236,7 @@ colorama가 제공되면 윈도우에서도 ANSI 색상이 동작하게 된다.
 .. click:example::
 
     @click.command()
-    @click.option('--count', default=1, help='number of greetings')
+    @click.option('--count', default=1, help='인사 횟수')
     @click.argument('name')
     def hello(count, name):
         for x in range(count):
