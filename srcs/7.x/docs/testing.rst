@@ -1,28 +1,28 @@
-Testing Click Applications
-==========================
+클릭 응용 테스트
+================
 
 .. currentmodule:: click.testing
 
-For basic testing, Click provides the :mod:`click.testing` module which
-provides test functionality that helps you invoke command line
-applications and check their behavior.
+기본적인 테스트를 위해 클릭에는 :mod:`click.testing` 모듈이
+들어 있다. 명령행 응용을 호출해서 동작을 확인하는 걸
+도와 주는 테스트 기능을 제공한다.
 
-These tools should really only be used for testing as they change
-the entire interpreter state for simplicity and are not in any way
-thread-safe!
+그 도구들은 진짜 테스트 용도로만 써야 한다. 단순성을 위해
+인터프리터 상태 전반을 변경하며 전혀 스레드에 안전하지 않기
+때문이다.
 
-Basic Testing
--------------
+기본 테스트
+-----------
 
-The basic functionality for testing Click applications is the
-:class:`CliRunner` which can invoke commands as command line scripts.  The
-:meth:`CliRunner.invoke` method runs the command line script in isolation
-and captures the output as both bytes and binary data.
+클릭 응용 테스트를 위한 기본 기능을 제공하는 건 명령을 명령행
+스크립트처럼 호출할 수 있는 :class:`CliRunner`\다.
+:meth:`CliRunner.invoke` 메소드가 명령행 스크립트를 독립적으로
+실행해서 그 출력을 bytes 및 이진 데이터로 캡처 한다.
 
-The return value is a :class:`Result` object, which has the captured output
-data, exit code, and optional exception attached.
+결과 값은 :class:`Result` 객체이며, 캡처 한 출력 데이터,
+종료 코드, 선택적으로 예외가 담겨 있다.
 
-Example::
+예::
 
     import click
     from click.testing import CliRunner
@@ -38,9 +38,9 @@ Example::
         assert result.exit_code == 0
         assert result.output == 'Hello Peter!\n'
 
-For subcommand testing, a subcommand name must be specified in the `args` parameter of :meth:`CliRunner.invoke` method.
+하위 명령을 테스트 하려면 :meth:`CliRunner.invoke` 메소드의 `args` 매개변수에 하위 명령 이름을 지정해 줘야 한다.
 
-Example::
+예::
 
     import click
     from click.testing import CliRunner
@@ -61,19 +61,19 @@ Example::
         assert 'Debug mode is on' in result.output
         assert 'Syncing' in result.output
 
-Additional keyword arguments passed to ``.invoke()`` will be used to construct the initial Context object. For example, if you want to run your tests against a fixed terminal width you can use the following::
+``.invoke()``\에 추가로 주는 키워드 인자들은 문맥 객체를 새로 구성하는 데 쓰이게 된다. 예를 들어 어떤 고정된 터미널 폭에 대해 테스트를 돌리고 싶다면 다음처럼 할 수 있다. ::
 
     runner = CliRunner()
     result = runner.invoke(cli, ['--debug', 'sync'], terminal_width=60)
 
-File System Isolation
----------------------
+파일 시스템 격리
+----------------
 
-For basic command line tools that want to operate with the file system, the
-:meth:`CliRunner.isolated_filesystem` method comes in useful which sets up
-an empty folder and changes the current working directory to.
+파일 시스템에 동작하는 간단한 명령행 도구에는
+:meth:`CliRunner.isolated_filesystem` 메소드가 유용하다.
+빈 폴더를 준비해서 현재 작업 디렉터리를 그리로 바꿔 준다.
 
-Example::
+예::
 
     import click
     from click.testing import CliRunner
@@ -93,11 +93,11 @@ Example::
             assert result.exit_code == 0
             assert result.output == 'Hello World!\n'
 
-Input Streams
--------------
+입력 스트림
+-----------
 
-The test wrapper can also be used to provide input data for the input
-stream (stdin).  This is very useful for testing prompts, for instance::
+테스트 래퍼를 사용해 입력 스트림(stdin)에 입력 데이터를 제공해
+줄 수도 있다. 프롬프트를 테스트 하는 데 아주 유용하다. 예::
 
     import click
     from click.testing import CliRunner
@@ -113,6 +113,5 @@ stream (stdin).  This is very useful for testing prompts, for instance::
         assert not result.exception
         assert result.output == 'Foo: wau wau\nfoo=wau wau\n'
 
-Note that prompts will be emulated so that they write the input data to
-the output stream as well.  If hidden input is expected then this
-obviously does not happen.
+참고로 출력 스트림에 입력 데이터도 나오도록 프롬프트 에뮬레이션이
+이뤄지게 된다. 입력을 감추도록 하면 당연히 나오지 않는다.
