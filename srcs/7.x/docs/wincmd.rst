@@ -1,80 +1,79 @@
-Windows Console Notes
+윈도우 콘솔 관련 사항
 =====================
 
 .. versionadded:: 6.0
 
-Until Click 6.0 there are various bugs and limitations with using Click on
-a Windows console.  Most notably the decoding of command line arguments
-was performed with the wrong encoding on Python 2 and on all versions of
-Python output of unicode characters was impossible.  Starting with Click
-6.0 we now emulate output streams on Windows to support unicode to the
-Windows console through separate APIs and we perform different decoding of
-parameters.
+클릭 6.0 전까지는 윈도우 콘솔에서 클릭을 쓰는 데 여러 버그와
+제약이 있었다. 가장 큰 문제로 파이썬 2에서 잘못된 인코딩으로
+명령행 인자 디코딩을 수행했으며 모든 파이썬 버전에서 유니코드
+문자 출력이 불가능했다. 클릭 6.0부터는 윈도우에서 출력 스트림을
+에뮬레이션 해서 별도 API를 통해 윈도우 콘솔 유니코드 출력을
+지원하며 다양한 매개변수 디코딩을 수행한다.
 
-Here is a brief overview of how this works and what it means to you.
+그게 대략 어떻게 동작하고 그래서 어떤 의미가 있는지 살펴보자.
 
-Unicode Arguments
------------------
+유니코드 인자
+-------------
 
-Click internally is generally based on the concept that any argument can
-come in as either byte string or unicode string and conversion is
-performed to the type expected value as late as possible.  This has some
-advantages as it allows us to accept the data in the most appropriate form
-for the operating system and Python version.
+클릭 내부에서는 기본적으로 어느 인자든 바이트 열 또는 유니코드
+열로 들어올 수 있다는 걸 전제하고 있으며 타입에서 기대하는
+값으로 변환하는 걸 최대한 늦게 수행한다. 이렇게 하면 운영 체제와
+파이썬 버전에 가장 적합한 형태로 데이터를 받을 수 있게 된다는
+장점이 있다.
 
-For instance paths are left as bytes on Python 2 unless you explicitly
-tell it otherwise.
+예를 들어 따로 지정하지 않는 한 파이썬 2에서 경로를 바이트
+그대로 둔다.
 
-This caused some problems on Windows where initially the wrong encoding
-was used and garbage ended up in your input data.  We not only fixed the
-encoding part, but we also now extract unicode parameters from `sys.argv`.
+이게 윈도우에서는 좀 문제가 됐다. 초기에 인코딩을 잘못 써서
+입력 데이터가 결국 쓰레기 값이 됐다. 하지만 그 인코딩 부분은
+수정됐으며 지금은 `sys.argv`\에서 유니코드 매개변수를 뽑아낸다.
 
-This means that on Python 2 under Windows, the arguments processed will
-*most likely* be of unicode nature and not bytes.  This was something that
-previously did not really happen unless you explicitly passed in unicode
-parameters so your custom types need to be aware of this.
+그로 인해 윈도우 하의 파이썬 2에서는 인자가 *거의 확실히*
+바이트가 아니라 유니코드 방식이 된다. 이전에는 명시적으로
+유니코드 매개변수를 주지 않는 한 이런 식으로 동작하지 않았다.
+따라서 따로 만든 타입이 있다면 주의할 필요가 있다.
 
-There is also another limitation with this: if `sys.argv` was modified
-prior to invoking a click handler, we have to fall back to the regular
-byte input in which case not all unicode values are available but only a
-subset of the codepage used for parameters.
+다른 제약 사항도 있다. 클릭 핸들러 호출 전에 `sys.argv`\가
+변경됐다면 다시 원래의 바이트 입력 방식을 써야 한다.
+그런데 그 경우에는 유니코드 값 전체가 아니라 매개변수에
+쓰인 코드페이지 일부만 사용 가능하다.
 
-Unicode Output and Input
-------------------------
+유니코드 입출력
+---------------
 
-Unicode output and input on Windows is implemented through the concept of
-a dispatching text stream.  What this means is that when click first needs
-a text output (or input) stream on windows it goes through a few checks to
-figure out of a windows console is connected or not.  If no Windows
-console is present then the text output stream is returned as such and the
-encoding for that stream is set to ``utf-8`` like on all platforms.
+윈도우에서 유니코드 출력과 입력은 텍스트 스트림 처리 방식으로
+구현돼 있다. 즉 클릭에서 처음 텍스트 출력(또는 입력) 스트림이
+필요할 때 몇 가지 검사를 해서 윈도우 콘솔이 연결돼 있는지
+여부를 알아낸다. 윈도우 콘솔이 없다면 텍스트 출력 스트림을
+그대로 반환하며 그 스트림의 인코딩은 다른 플랫폼과 마찬가지로
+``utf-8``\으로 설정돼 있다.
 
-However if a console is connected the stream will instead be emulated and
-use the cmd.exe unicode APIs to output text information.  In this case the
-stream will also use ``utf-16-le`` as internal encoding.  However there is
-some hackery going on that the underlying raw IO buffer is still bypassing
-the unicode APIs and byte output through an indirection is still possible.
+하지만 콘솔이 연결돼 있으면 스트림을 에뮬레이션 하게 되며
+cmd.exe의 유니코드 API를 써서 텍스트 정보를 출력한다. 이 경우
+그 스트림 역시 내부 인코딩으로 ``utf-16-le``\를 쓰게 된다.
+하지만 하위 raw IO 버퍼가 유니코드 API를 건너뛰게 하는 좀
+복잡한 처리가 있으며 간접적으로 바이트 출력을 하는 게 여전히
+가능하다.
 
-This hackery is used on both Python 2 and Python 3 as neither version of
-Python has native support for cmd.exe with unicode characters.  There are
-some limitations you need to be aware of:
+이 처리를 파이썬 2와 파이썬 3 모두에서 쓴다. 어느 쪽 버전에서도
+cmd.exe에서의 유니코드 문자 사용을 그냥은 지원하지 않기 때문이다.
+유의해야 할 제약 사항이 몇 가지 있다.
 
-*   This unicode support is limited to ``click.echo``, ``click.prompt`` as
-    well as ``click.get_text_stream``.
-*   Depending on if unicode values or byte strings are passed the control
-    flow goes completely different places internally which can have some
-    odd artifacts if data partially ends up being buffered.  Click
-    attempts to protect against that by manually always flushing but if
-    you are mixing and matching different string types to ``stdout`` or
-    ``stderr`` you will need to manually flush.
-*   The raw output stream is set to binary mode, which is a global
-    operation on Windows, so ``print`` calls will be affected. Prefer
-    ``click.echo`` over ``print``.
-*   On Windows 7 and below, there is a limitation where at most 64k
-    characters can be written in one call in binary mode. In this
-    situation, ``sys.stdout`` and ``sys.stderr`` are replaced with
-    wrappers that work around the limitation.
+*   이런 유니코드 지원은 ``click.echo``, ``click.prompt``, 그리고
+    ``click.get_text_stream``\에 한정된다.
+*   유니코드 값과 바이트 열 중 어느 쪽을 주냐에 따라 내부
+    제어 흐름이 완전히 달라지며, 그래서 데이터 일부가 버퍼링
+    되는 경우 어떤 특이 사항이 있을 수 있다. 클릭에서는 항상
+    직접 플러시를 해서 그런 경우를 막으려 하지만 ``stdout``\이나
+    ``stderr``\에 다른 문자열 타입을 섞어서 쓰는 경우에는
+    직접 플러시를 해 줘야 한다.
+*   raw 출력 스트림은 윈도우 전체 동작 방식인 이진 모드 설정돼
+    있고, 그래서 ``print`` 호출이 영향을 받게 된다. ``print`` 대신
+    ``click.echo``\를 쓰자.
+*   윈도우 7 및 이하에서는 이진 모드에서 한 호출당 최대 64k개
+    문자까지만 쓸 수 있다는 제한이 있다. 그 경우 ``sys.stdout``
+    및 ``sys.stderr``\를 래퍼로 교체해서 그 제한을 피한다.
 
-Another important thing to note is that the Windows console's default
-fonts do not support a lot of characters which means that you are mostly
-limited to international letters but no emojis or special characters.
+또 유의할 사항은 윈도우 콘솔의 기본 폰트가 많은 문자를
+지원하지 않는다는 점이다. 즉 국제적으로 통용되는 문자들은
+가능하지만 이모지나 특수 문자는 거의 안 된다.
