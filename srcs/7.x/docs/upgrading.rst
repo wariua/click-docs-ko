@@ -1,100 +1,98 @@
-Upgrading To Newer Releases
-===========================
+최신 릴리스로 업그레이드 하기
+=============================
 
-Click attempts the highest level of backwards compatibility but sometimes
-this is not entirely possible.  In case we need to break backwards
-compatibility this document gives you information about how to upgrade or
-handle backwards compatibility properly.
+클릭은 최대한 높은 수준의 하위 호환성을 추구하지만 그게 완전히
+가능하지는 않을 때가 있다. 하위 호환성이 깨지는 경우에 이
+문서에서 업그레이드 방법 내지 올바른 하위 호환성 처리 방법을
+설명한다.
 
 .. _upgrade-to-3.2:
 
-Upgrading to 3.2
-----------------
+3.2 업그레이드
+--------------
 
-Click 3.2 had to perform two changes to multi commands which were
-triggered by a change between Click 2 and Click 3 that had bigger
-consequences than anticipated.
+클릭 3.2에서는 다중 명령에 두 가지 변화를 줘야 했다. 클릭 2와
+클릭 3 사이의 어느 변경 사항에서 유발된 건데 영향이 예상보다
+커졌다.
 
-Context Invokes
-```````````````
+문맥 호출
+`````````
 
-Click 3.2 contains a fix for the :meth:`Context.invoke` function when used
-with other commands.  The original intention of this function was to
-invoke the other command as as if it came from the command line when it
-was passed a context object instead of a function.  This use was only
-documented in a single place in the documentation before and there was no
-proper explanation for the method in the API documentation.
+클릭 3.2에는 :meth:`Context.invoke` 함수를 다른 명령과 함께
+쓸 때에 대한 수정 사항이 포함돼 있다. 이 함수의 원래 목적은
+함수가 아니라 문맥 객체를 받았을 때 다른 명령을 명령행에서
+들어가는 것처럼 호출하는 것이었다. 이런 용도가 이전에는
+문서 상의 한 곳에만 기록돼 있었고 API 문서에 이 메소드에
+대한 제대로 된 설명이 없었다.
 
-The core issue is that before 3.2 this call worked against intentions::
+핵심 문제는 3.2 전에 이 호출이 의도와 어긋나게 동작했다는 것이다. ::
 
     ctx.invoke(other_command, 'arg1', 'arg2')
 
-This was never intended to work as it does not allow Click to operate on
-the parameters.  Given that this pattern was never documented and ill
-intended the decision was made to change this behavior in a bugfix release
-before it spreads by accident and developers depend on it.
+절대 이걸 의도한 게 아니다. 이렇게 하면 클릭에서 매개변수를
+어떻게 건드릴 수가 없게 된다. 이 사용 패턴은 한 번도 문서화
+된 적이 없고 의도에 어긋나는 것이다. 그래서 자칫 사용이
+확산돼서 여러 개발자들이 쓰게 되기 전에 버그 수정 릴리스에서
+동작 방식을 바꾸기로 결정이 이뤄졌다.
 
-The correct invocation for the above command is the following::
+위 명령을 올바로 호출하는 방식은 다음과 같다. ::
 
     ctx.invoke(other_command, name_of_arg1='arg1', name_of_arg2='arg2')
 
-This also allowed us to fix the issue that defaults were not handled
-properly by this function.
+이렇게 하면 이 함수가 기본값을 제대로 다루지 못했던 문제까지
+고칠 수 있게 된다.
 
-Multicommand Chaining API
-`````````````````````````
+다중 명령 연쇄 API
+``````````````````
 
-Click 3 introduced multicommand chaining.  This required a change in how
-Click internally dispatches.  Unfortunately this change was not correctly
-implemented and it appeared that it was possible to provide an API that
-can inform the super command about all the subcommands that will be
-invoked.
+클릭 3에서 다중 명령 연쇄 사용 기능이 추가됐다. 이를 위해선
+클릭 내부에서 보내기를 하는 방식을 바꿔야 했다. 그런데 그게
+올바로 구현되질 않았으며 상위 명령에게 호출될 모든 하위
+명령에 대해 알려 줄 수 있는 API를 제공하는 게 가능해 보였다.
 
-This assumption however does not work with one of the API guarantees that
-have been given in the past.  As such this functionality has been removed
-in 3.2 as it was already broken.  Instead the accidentally broken
-functionality of the :attr:`Context.invoked_subcommand` attribute was
-restored.
+하지만 그 가정은 과거에 API에서 제시한 보장 사항 한 가지와
+충돌한다. 그래서 안그래도 이미 동작에 문제가 있던 그 기능성을
+3.2에서 제거했다. 대신 의도치 않게 문제가 생겼던
+:attr:`Context.invoked_subcommand` 속성의 기능성을 되살렸다.
 
-If you do require the know which exact commands will be invoked there are
-different ways to cope with this.  The first one is to let the subcommands
-all return functions and then to invoke the functions in a
-:meth:`Context.resultcallback`.
+정확히 어떤 명령들이 호출될지 알아야 할 필요가 있다면 여러
+대처 방법이 있다. 첫째로 가능한 방법은 하위 명령 모두가
+함수를 반환하도록 하고서 :meth:`Context.resultcallback`\에서
+그 함수들을 호출하는 것이다.
 
 
 .. _upgrade-to-2.0:
 
-Upgrading to 2.0
-----------------
+2.0 업그레이드
+--------------
 
-Click 2.0 has one breaking change which is the signature for parameter
-callbacks.  Before 2.0, the callback was invoked with ``(ctx, value)``
-whereas now it's ``(ctx, param, value)``.  This change was necessary as it
-otherwise made reusing callbacks too complicated.
+클릭 2.0에는 호환성을 깨는 변화가 한 가지 있는데 바로 매개변수
+콜백 시그너처다. 2.0 전에선 ``(ctx, value)``\로 콜백을 호출했지만
+이제는 ``(ctx, param, value)``\다. 이렇게 안 하면 콜백 재사용이
+너무 복잡해지기 때문에 바꿀 필요가 있었다.
 
-To ease the transition Click will still accept old callbacks.  Starting
-with Click 3.0 it will start to issue a warning to stderr to encourage you
-to upgrade.
+이전을 돕기 위해 클릭에서는 계속 구식 콜백을 받게 된다. 클릭
+3.0부터는 stderr로 경로를 찍어서 업그레이드를 권장할 것이다.
 
-In case you want to support both Click 1.0 and Click 2.0, you can make a
-simple decorator that adjusts the signatures::
+클릭 1.0과 클릭 2.0을 모두 지원하고 싶은 경우에는 시그너처를
+조정해 주는 간단한 데코레이터를 만들면 된다. ::
 
     import click
     from functools import update_wrapper
 
     def compatcallback(f):
-        # Click 1.0 does not have a version string stored, so we need to
-        # use getattr here to be safe.
+        # 클릭 1.0에는 버전 문자열이 없으므로 안전을 위해
+        # getattr을 써야 한다.
         if getattr(click, '__version__', '0.0') >= '2.0':
             return f
         return update_wrapper(lambda ctx, value: f(ctx, None, value), f)
 
-With that helper you can then write something like this::
+그 다음엔 다음처럼 작성하면 된다. ::
 
     @compatcallback
     def callback(ctx, param, value):
         return value.upper()
 
-Note that because Click 1.0 did not pass a parameter, the `param` argument
-here would be `None`, so a compatibility callback could not use that
-argument.
+클릭 1.0에서는 매개변수를 전달하지 않으므로 `param` 인자가
+`None`\이 될 것이고, 따라서 호환 콜백에서 그 인자를 사용할
+수 없을 것이다.
