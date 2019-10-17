@@ -3,10 +3,9 @@ API
 
 .. module:: click
 
-This part of the documentation lists the full API reference of all public
-classes and functions.
+모든 공개 클래스 및 함수들에 대한 전체 API 참조 문서이다.
 
-Decorators
+데코레이터
 ----------
 
 .. autofunction:: command
@@ -31,8 +30,8 @@ Decorators
 
 .. autofunction:: make_pass_decorator
 
-Utilities
----------
+유틸리티
+--------
 
 .. autofunction:: echo
 
@@ -72,8 +71,8 @@ Utilities
 
 .. autofunction:: format_filename
 
-Commands
---------
+명령
+----
 
 .. autoclass:: BaseCommand
    :members:
@@ -90,8 +89,8 @@ Commands
 .. autoclass:: CommandCollection
    :members:
 
-Parameters
-----------
+매개변수
+--------
 
 .. autoclass:: Parameter
    :members:
@@ -100,16 +99,16 @@ Parameters
 
 .. autoclass:: Argument
 
-Context
--------
+문맥
+----
 
 .. autoclass:: Context
    :members:
 
 .. autofunction:: get_current_context
 
-Types
------
+타입
+----
 
 .. autodata:: STRING
 
@@ -136,8 +135,8 @@ Types
 .. autoclass:: ParamType
    :members:
 
-Exceptions
-----------
+예외
+----
 
 .. autoexception:: ClickException
 
@@ -155,22 +154,22 @@ Exceptions
 
 .. autoexception:: BadArgumentUsage
 
-Formatting
-----------
+서식
+----
 
 .. autoclass:: HelpFormatter
    :members:
 
 .. autofunction:: wrap_text
 
-Parsing
--------
+파싱
+----
 
 .. autoclass:: OptionParser
    :members:
 
-Testing
--------
+테스트
+------
 
 .. currentmodule:: click.testing
 
