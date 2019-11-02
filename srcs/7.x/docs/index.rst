@@ -9,10 +9,10 @@
     :target: https://palletsprojects.com/p/click/
 
 클릭(Click)은 꼭 필요한 코드만으로 아름다운 명령행 인터페이스를
-조립할 수 있는 파이썬 패키지다. "Command Line Interface Creation Kit"를
+조합할 수 있는 파이썬 패키지다. "Command Line Interface Creation Kit"을
 줄인 이름이다. 폭넓은 설정이 가능하면서도 적절한 기본값이 갖춰져 있다.
 
-명령행 도구 작성 작업을 빠르고 재밌게 만들면서도 원하는 CLI API를
+명령행 도구 작성 작업을 빠르고 재밌게 만들어 주면서도 원하는 CLI API를
 구현할 수 없어서 좌절하는 일이 없도록 하는 걸 목표로 한다.
 
 클릭에는 세 가지 특징이 있다.
@@ -21,7 +21,7 @@
 -   도움말 자동 생성
 -   하위 모듈 런타임 적재 지원
 
-다음은 간단한 클릭 프로그램 예시이다.
+다음은 간단한 클릭 프로그램 예시다.
 
 .. click:example::
 
