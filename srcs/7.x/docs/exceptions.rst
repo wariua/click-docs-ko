@@ -3,17 +3,17 @@
 
 .. currentmodule:: click
 
-클릭에서는 내부적으로 예외를 사용해서 사용자나 응용이 일으킬 수
+클릭에서는 내부적으로 예외를 사용해서 응용 사용자가 일으킬 수
 있는 다양한 오류 상황들을 알린다. 주로 잘못된 방식으로 사용하는
-경우이다.
+경우들이다.
 
 어디서 오류를 처리하는가?
 -------------------------
 
 클릭에서 오류 처리는 주로 :meth:`BaseCommand.main`\에서 이뤄진다.
-거기서 :exc:`ClickException`\의 모든 하위 클래스에 더해서
-표준 :exc:`EOFError` 및 :exc:`KeyboardInterrupt` 예외를 처리한다.
-뒤의 예외들은 내부적으로 :exc:`Abort`\로 변환한다.
+:exc:`ClickException`\의 모든 하위 클래스에 더해서 표준
+:exc:`EOFError` 및 :exc:`KeyboardInterrupt` 예외를 처리한다.
+뒤의 두 예외는 내부적으로 :exc:`Abort`\로 변환된다.
 
 다음 로직을 적용한다.
 
@@ -24,20 +24,20 @@
     :attr:`ClickException.exit_code`\로 프로그램을 끝낸다.
 3.  :exc:`Abort` 예외가 던져졌으면 문자열  ``Aborted!``\를
     표준 오류로 찍은 다음 종료 코드 ``1``\로 프로그램을 끝낸다.
-4.  모두 지나쳤으면 종료 코드 ``0``\으로 프로그램을 끝낸다.
+4.  다 통과했으면 종료 코드 ``0``\으로 프로그램을 끝낸다.
 
 그렇게 하기 싫으면?
 -------------------
 
 일반적으로 언제든 :meth:`invoke` 메소드를 직접 호출할 수도
 있다. 예를 들어 :class:`Command` 객체가 있다면 다음처럼
-수동으로 호출할 수 있다. ::
+직접 호출할 수 있다. ::
 
     ctx = command.make_context('command-name', ['args', 'go', 'here'])
     with ctx:
         result = command.invoke(ctx)
 
-이렇게 하면 기대하는 대로 예외가 전혀 처리되지 않고 튀어나오게
+예상할 수 있듯 이렇게 하면 예외가 전혀 처리되지 않고 튀어나오게
 된다.
 
 클릭 3.0부터는 :meth:`Command.main` 메소드를 쓰면서 단독 실행
@@ -52,8 +52,8 @@
 어떤 예외들이 있는가?
 ---------------------
 
-클릭에는 두 가지 기반 예외가 있다. :exc:`ClickException`\은
-클릭에서 사용자에게 알리고 싶은 모든 예외 상황들에서 던진다.
+클릭에는 두 가지 베이스 예외가 있다. :exc:`ClickException`\은
+클릭에서 사용자에게 알리고 싶은 모든 예외 상황에서 던진다.
 그리고 :exc:`Abort`\는 클릭이 실행을 중단하도록 하는 데 쓴다.
 
 :exc:`ClickException`\에는 :meth:`~ClickException.show` 메소드가
