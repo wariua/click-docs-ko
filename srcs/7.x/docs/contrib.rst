@@ -4,22 +4,20 @@
 click-contrib
 =============
 
-As the userbase of Click grows, more and more major feature requests pop up in
-Click's bugtracker. As reasonable as it may be for those features to be bundled
-with Click instead of being a standalone project, many of those requested
-features are either highly experimental or have unproven practical use, while
-potentially being a burden to maintain.
+클릭 사용자층이 늘어나면서 클릭 버그 트래커에 큰 기능 요청이 점점 더
+많이 나오고 있다. 합당한 선에선 그 기능들을 단독 프로젝트로 하기보다
+클릭에 포함시키는 게 좋겠지만 요청 기능들 중 상당수는 아주 실험적이거나
+현실적 유용성이 검증되지 않았고, 유지보수에 부담이 될 가능성이 있다.
 
-This is why click-contrib_ exists. The GitHub organization is a collection of
-possibly experimental third-party packages whose featureset does not belong
-into Click, but also a playground for major features that may be added to Click
-in the future. It is also meant to coordinate and concentrate effort on writing
-third-party extensions for Click, and to ease the effort of searching for such
-extensions. In that sense it could be described as a low-maintenance
-alternative to extension repositories of other frameworks.
+그래서 click-contrib_\가 있다. 이 GitHub 단체는 피처셋이 클릭에 들어가지
+못한 실험적일 수도 있는 서드파티 패키지들의 모음이기도 하지만 향후
+클릭에 추가될 큰 기능을 위한 실험 공간이기도 하다. 또한 클릭 서드파티
+확장을 작성하는 작업을 조정 및 집중하고 그런 확장들을 쉽게 찾을 수
+있게 해 준다는 의미도 있다. 그런 의미에서 다른 프레임워크의 확장
+저장소들에 대한 유지 비용 낮은 대안이라고 할 수도 있겠다.
 
-Please note that the quality and stability of those packages may be different
-than what you expect from Click itself. While published under a common
-organization, they are still projects separate from Click.
+그 패키지들의 품질과 안정성은 클릭 자체에 기대하는 수준과 다를 수도
+있다는 점을 부디 유의하자. 공통 단체 하에서 배포되기는 하지만
+클릭과는 별개의 프로젝트들이다.
 
 .. _click-contrib: https://github.com/click-contrib/
