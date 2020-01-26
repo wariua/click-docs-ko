@@ -127,16 +127,16 @@ class StringParamType(ParamType):
 
 
 class Choice(ParamType):
-    """The choice type allows a value to be checked against a fixed set
-    of supported values. All of these values have to be strings.
+    """선택 타입을 이용하면 값이 정해진 지원 값들 중 하나인지
+    확인할 수 있다. 지원 값들은 모두 문자열이어야 한다.
 
-    You should only pass a list or tuple of choices. Other iterables
-    (like generators) may lead to surprising results.
+    선택지들의 리스트나 튜플을 줘야 한다. (제너레이터 같은)
+    다른 이터러블은 예상치 못한 결과를 유발할 수 있다.
 
-    See :ref:`choice-opts` for an example.
+    :ref:`choice-opts`\의 예시 참고.
 
-    :param case_sensitive: Set to false to make choices case
-        insensitive. Defaults to true.
+    :param case_sensitive: 거짓으로 설정하면 선택지들이
+        대소문자 구분이 없게 됨. 기본은 참.
     """
 
     name = 'choice'
@@ -184,22 +184,22 @@ class Choice(ParamType):
 
 
 class DateTime(ParamType):
-    """The DateTime type converts date strings into `datetime` objects.
+    """DateTime 타입은 날짜 문자열을 `datetime` 객체로 변환한다.
 
-    The format strings which are checked are configurable, but default to some
-    common (non-timezone aware) ISO 8601 formats.
+    확인할 형식 문자열들을 설정할 수 있으며 몇 가지 많이 쓰는
+    (시간대 없는) ISO 8601 형식들이 기본값이다.
 
-    When specifying *DateTime* formats, you should only pass a list or a tuple.
-    Other iterables, like generators, may lead to surprising results.
+    *DateTime* 형식을 지정할 때 리스트나 튜플을 줘야 한다.
+    제너레이터 같은 다른 이터러블은 예상치 못한 결과를 유발할 수 있다.
 
-    The format strings are processed using ``datetime.strptime``, and this
-    consequently defines the format strings which are allowed.
+    형식 문자열들은 ``datetime.strptime``\으로 처리되며, 그에 따라
+    허용되는 형식 문자열이 규정된다.
 
-    Parsing is tried using each format, in order, and the first format which
-    parses successfully is used.
+    각 형식을 차례대로 사용해 파싱을 시도하며 파싱이 성공한 첫 번째
+    형식을 쓴다.
 
-    :param formats: A list or tuple of date format strings, in the order in
-                    which they should be tried. Defaults to
+    :param formats: 시도 순서대로 된 날짜 형식 문자열들의 리스트
+                    또는 튜플. 기본값은
                     ``'%Y-%m-%d'``, ``'%Y-%m-%dT%H:%M:%S'``,
                     ``'%Y-%m-%d %H:%M:%S'``.
     """
@@ -250,12 +250,11 @@ class IntParamType(ParamType):
 
 
 class IntRange(IntParamType):
-    """A parameter that works similar to :data:`click.INT` but restricts
-    the value to fit into a range.  The default behavior is to fail if the
-    value falls outside the range, but it can also be silently clamped
-    between the two edges.
+    """:data:`click.INT`\와 비슷하게 동작하되 값을 어떤 범위로
+    제약하는 매개변수. 값이 범위를 벗어날 때 기본 동작은 실패하는
+    것이지만 두 경곗값 중 하나로 조용히 자를 수도 있다.
 
-    See :ref:`ranges` for an example.
+    :ref:`ranges`\의 예시 참고.
     """
     name = 'integer range'
 
@@ -303,12 +302,11 @@ class FloatParamType(ParamType):
 
 
 class FloatRange(FloatParamType):
-    """A parameter that works similar to :data:`click.FLOAT` but restricts
-    the value to fit into a range.  The default behavior is to fail if the
-    value falls outside the range, but it can also be silently clamped
-    between the two edges.
+    """:data:`click.FLOAT`\과 비슷하게 동작하되 값을 어떤 범위로
+    제약하는 매개변수. 값이 범위를 벗어날 때 기본 동작은 실패하는
+    것이지만 두 경곗값 중 하나로 조용히 자를 수도 있다.
 
-    See :ref:`ranges` for an example.
+    :ref:`ranges`\의 예시 참고.
     """
     name = 'float range'
 
@@ -375,30 +373,29 @@ class UUIDParameterType(ParamType):
 
 
 class File(ParamType):
-    """Declares a parameter to be a file for reading or writing.  The file
-    is automatically closed once the context tears down (after the command
-    finished working).
+    """매개변수를 읽기 또는 쓰기용 파일로 선언한다. 그 파일은 (명령
+    동작이 완료된 후) 문맥이 없어지면 자동으로 닫힌다.
 
-    Files can be opened for reading or writing.  The special value ``-``
-    indicates stdin or stdout depending on the mode.
+    파일을 읽기 또는 쓰기용으로 열 수 있다. 특수 값 ``-``\는
+    모드에 따라 stdin이나 stdout을 나타낸다.
 
-    By default, the file is opened for reading text data, but it can also be
-    opened in binary mode or for writing.  The encoding parameter can be used
-    to force a specific encoding.
+    기본적으로는 파일이 텍스트 읽기용으로 열리지만 바이너리 모드나
+    쓰기용으로 열 수도 있다. 그리고 encoding 매개변수를 써서 특정
+    인코딩을 강제할 수 있다.
 
-    The `lazy` flag controls if the file should be opened immediately or upon
-    first IO. The default is to be non-lazy for standard input and output
-    streams as well as files opened for reading, `lazy` otherwise. When opening a
-    file lazily for reading, it is still opened temporarily for validation, but
-    will not be held open until first IO. lazy is mainly useful when opening
-    for writing to avoid creating the file until it is needed.
+    ``lazy`` 플래그는 파일을 즉시 열지 아니면 첫 IO에서 열지를 제어한다.
+    기본 방식은 표준 입력 및 출력 스트림, 그리고 읽기용으로 여는 파일은
+    즉시 열고 그 외는 늦게 여는 것이다. 파일을 읽기용으로 늦게 열 때는
+    확인을 위해 잠깐 열기는 하되 첫 IO까지 열어두지 않는다. 늦게 여는
+    동작이 유용한 건 쓰기용으로 열면서 필요할 때까지는 파일이 생성되지
+    않게 할 때이다.
 
-    Starting with Click 2.0, files can also be opened atomically in which
-    case all writes go into a separate file in the same folder and upon
-    completion the file will be moved over to the original location.  This
-    is useful if a file regularly read by other users is modified.
+    클릭 2.0부터는 파일을 원자적으로 열 수도 있는데, 그렇게 하면
+    모든 쓰기 내용이 같은 폴더 내의 별도 파일로 가며 작업이 끝나면
+    그 파일이 원래 위치로 옮겨지게 된다. 다른 사용자들이 규칙적으로
+    읽는 파일을 변경하는 경우에 유용하다.
 
-    See :ref:`file-args` for more information.
+    더 자세한 내용은 :ref:`file-args` 참고.
     """
     name = 'filename'
     envvar_list_splitter = os.path.pathsep
@@ -456,34 +453,32 @@ class File(ParamType):
 
 
 class Path(ParamType):
-    """The path type is similar to the :class:`File` type but it performs
-    different checks.  First of all, instead of returning an open file
-    handle it returns just the filename.  Secondly, it can perform various
-    basic checks about what the file or directory should be.
+    """경로 타입은 :class:`File` 타입과 비슷하되 다른 검사들을
+    수행한다. 우선 열린 파일 핸들을 반환하는 게 아니라 그냥 파일명을
+    반환한다. 그리고 그 파일 내지 디렉터리가 어떠해야 하는가에 대한
+    다양한 기본 검사를 수행할 수 있다.
 
     .. versionchanged:: 6.0
-       `allow_dash` was added.
+       `allow_dash` 추가됨.
 
-    :param exists: if set to true, the file or directory needs to exist for
-                   this value to be valid.  If this is not required and a
-                   file does indeed not exist, then all further checks are
-                   silently skipped.
-    :param file_okay: controls if a file is a possible value.
-    :param dir_okay: controls if a directory is a possible value.
-    :param writable: if true, a writable check is performed.
-    :param readable: if true, a readable check is performed.
-    :param resolve_path: if this is true, then the path is fully resolved
-                         before the value is passed onwards.  This means
-                         that it's absolute and symlinks are resolved.  It
-                         will not expand a tilde-prefix, as this is
-                         supposed to be done by the shell only.
-    :param allow_dash: If this is set to `True`, a single dash to indicate
-                       standard streams is permitted.
-    :param path_type: optionally a string type that should be used to
-                      represent the path.  The default is `None` which
-                      means the return value will be either bytes or
-                      unicode depending on what makes most sense given the
-                      input data Click deals with.
+    :param exists: 참으로 설정 시 이 값이 유효하려면 파일 내지
+                   디렉터리가 존재해야 함. 이 조건을 지정하지 않고
+                   파일이 실재 존재하지 않으면 이후 검사를 모두
+                   조용히 건너뛴다.
+    :param file_okay: 파일이 가능한 값인지 여부를 지정.
+    :param dir_okay: 디렉터리가 가능한 값인지 여부를 지정.
+    :param writable: 참이면 쓰기 가능 여부 검사를 수행.
+    :param readable: 참이면 읽기 가능 여부 검사를 수행.
+    :param resolve_path: 참이면 경로를 완전히 해석하고 나서 값을
+                         계속 전달함. 즉 절대 경로가 되고 심볼릭
+                         링크들을 해석한다. 물결표 확장은 셸에서
+                         할 일이므로 하지 않는다.
+    :param allow_dash: `True`\로 설정 시 대시 하나로 표준 스트림을
+                       나타내는 걸 허용함.
+    :param path_type: 선택적. 경로를 나타내는 데 사용해야 할
+                      문자열 타입. 기본은 `None`\으로, 클릭에서
+                      처리하는 입력 데이터가 어느 쪽에 맞는가에
+                      따라 반환 값이 bytes 아니면 unicode가 된다.
     """
     envvar_list_splitter = os.path.pathsep
 
@@ -561,17 +556,17 @@ class Path(ParamType):
 
 
 class Tuple(CompositeParamType):
-    """The default behavior of Click is to apply a type on a value directly.
-    This works well in most cases, except for when `nargs` is set to a fixed
-    count and different types should be used for different items.  In this
-    case the :class:`Tuple` type can be used.  This type can only be used
-    if `nargs` is set to a fixed number.
+    """클릭의 기본 동작은 각 값에 바로 타입을 적용하는 것이다.
+    대부분 경우에는 잘 동작하지만 `nargs`\가 어떤 정해진 개수이고
+    항목마다 다른 타입을 써야 할 때는 예외이다. 그때는
+    :class:`Tuple` 타입을 쓸 수 있다. 이 타입은 `nargs`\를 고정
+    개수로 설정한 경우에만 쓸 수 있다.
 
-    For more information see :ref:`tuple-type`.
+    자세한 내용은 :ref:`tuple-type` 참고.
 
-    This can be selected by using a Python tuple literal as a type.
+    type으로 파이썬 튜플 리터럴을 쓰면 이 타입을 선택할 수 있다.
 
-    :param types: a list of types that should be used for the tuple items.
+    :param types: 튜플 항목들에 쓸 타입들의 리스트.
     """
 
     def __init__(self, types):
