@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>예외 처리 &#8212; 클릭 문서 (7.x)</title>
+    <link rel="stylesheet" href="_static/click.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/click-icon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="파이썬 3 지원" href="python3.html" />
+    <link rel="prev" title="Bash 완성 기능" href="bashcomplete.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="python3.html" title="파이썬 3 지원"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="bashcomplete.html" title="Bash 완성 기능"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">클릭 문서 (7.x)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>예외 처리<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>클릭에서는 내부적으로 예외를 사용해서 응용 사용자가 일으킬 수
+있는 다양한 오류 상황들을 알린다. 주로 잘못된 방식으로 사용하는
+경우들이다.</p>
+<div class="section" id="id2">
+<h2>어디서 오류를 처리하는가?<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>클릭에서 오류 처리는 주로 <a class="reference internal" href="api.html#click.BaseCommand.main" title="click.BaseCommand.main"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseCommand.main()</span></code></a>에서 이뤄진다.
+<a class="reference internal" href="api.html#click.ClickException" title="click.ClickException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ClickException</span></code></a>의 모든 하위 클래스에 더해서 표준
+<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#EOFError" title="(in Python v3.8)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">EOFError</span></code></a> 및 <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyboardInterrupt" title="(in Python v3.8)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a> 예외를 처리한다.
+뒤의 두 예외는 내부적으로 <a class="reference internal" href="api.html#click.Abort" title="click.Abort"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Abort</span></code></a>로 변환된다.</p>
+<p>다음 로직을 적용한다.</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#EOFError" title="(in Python v3.8)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">EOFError</span></code></a>나 <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyboardInterrupt" title="(in Python v3.8)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a>가 발생하면
+<a class="reference internal" href="api.html#click.Abort" title="click.Abort"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Abort</span></code></a>를 다시 던진다.</p></li>
+<li><p><a class="reference internal" href="api.html#click.ClickException" title="click.ClickException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ClickException</span></code></a>이 던져졌으면 <code class="xref py py-meth docutils literal notranslate"><span class="pre">ClickException.show()</span></code>
+메소드를 호출해서 내용을 표시한 다음
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">ClickException.exit_code</span></code>로 프로그램을 끝낸다.</p></li>
+<li><p><a class="reference internal" href="api.html#click.Abort" title="click.Abort"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Abort</span></code></a> 예외가 던져졌으면 문자열  <code class="docutils literal notranslate"><span class="pre">Aborted!</span></code>를
+표준 오류로 찍은 다음 종료 코드 <code class="docutils literal notranslate"><span class="pre">1</span></code>로 프로그램을 끝낸다.</p></li>
+<li><p>다 통과했으면 종료 코드 <code class="docutils literal notranslate"><span class="pre">0</span></code>으로 프로그램을 끝낸다.</p></li>
+</ol>
+</div>
+<div class="section" id="id3">
+<h2>그렇게 하기 싫으면?<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>일반적으로 언제든 <code class="xref py py-meth docutils literal notranslate"><span class="pre">invoke()</span></code> 메소드를 직접 호출할 수도
+있다. 예를 들어 <a class="reference internal" href="api.html#click.Command" title="click.Command"><code class="xref py py-class docutils literal notranslate"><span class="pre">Command</span></code></a> 객체가 있다면 다음처럼
+직접 호출할 수 있다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ctx</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">make_context</span><span class="p">(</span><span class="s1">&#39;command-name&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;go&#39;</span><span class="p">,</span> <span class="s1">&#39;here&#39;</span><span class="p">])</span>
+<span class="k">with</span> <span class="n">ctx</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>예상할 수 있듯 이렇게 하면 예외가 전혀 처리되지 않고 튀어나오게
+된다.</p>
+<p>클릭 3.0부터는 <code class="xref py py-meth docutils literal notranslate"><span class="pre">Command.main()</span></code> 메소드를 쓰면서 단독 실행
+모드를 끌 수도 있다. 그러면 예외 처리와 마지막의 암묵적
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">sys.exit()</span></code>가 비활성화된다.</p>
+<p>즉 다음처럼 할 수 있다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">command</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="s1">&#39;command-name&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;go&#39;</span><span class="p">,</span> <span class="s1">&#39;here&#39;</span><span class="p">],</span>
+             <span class="n">standalone_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>어떤 예외들이 있는가?<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>클릭에는 두 가지 베이스 예외가 있다. <a class="reference internal" href="api.html#click.ClickException" title="click.ClickException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ClickException</span></code></a>은
+클릭에서 사용자에게 알리고 싶은 모든 예외 상황에서 던진다.
+그리고 <a class="reference internal" href="api.html#click.Abort" title="click.Abort"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Abort</span></code></a>는 클릭이 실행을 중단하도록 하는 데 쓴다.</p>
+<p><a class="reference internal" href="api.html#click.ClickException" title="click.ClickException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ClickException</span></code></a>에는 <code class="xref py py-meth docutils literal notranslate"><span class="pre">show()</span></code> 메소드가
+있어서 오류 메시지를 stderr나 주어진 파일 객체로 표시할 수 있다.
+예외를 직접 사용해서 뭔가 하고 싶다면 다른 메소드나 속성이 뭐가
+있는지 API 문서를 확인해 볼 수 있다.</p>
+<p>다음 하위 클래스들을 많이 쓴다.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="api.html#click.UsageError" title="click.UsageError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UsageError</span></code></a>로 뭔가 문제가 있음을 사용자에게 알린다.</p></li>
+<li><p><a class="reference internal" href="api.html#click.BadParameter" title="click.BadParameter"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BadParameter</span></code></a>로 특정 매개변수에 뭔가 문제가 있음을
+사용자에게 알린다. 많은 경우 클릭 내부에서 처리하며 가능하면
+추가 정보를 채운다. 예를 들어 콜백에서 이 예외를 던진 경우
+가능하다면 클릭에서 매개변수 이름을 자동으로 채운다.</p></li>
+<li><p><a class="reference internal" href="api.html#click.FileError" title="click.FileError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FileError</span></code></a>는 클릭에서 파일을 열면서 문제가 생겼을 때
+<a class="reference internal" href="api.html#click.File" title="click.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">File</span></code></a> 타입에서 던지는 오류다.</p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/click-logo-sidebar.png" alt="Logo"/>
+            </a></p>
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">예외 처리</a><ul>
+<li><a class="reference internal" href="#id2">어디서 오류를 처리하는가?</a></li>
+<li><a class="reference internal" href="#id3">그렇게 하기 싫으면?</a></li>
+<li><a class="reference internal" href="#id4">어떤 예외들이 있는가?</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="bashcomplete.html" title="previous chapter">Bash 완성 기능</a>
+          <li>Next: <a href="python3.html" title="next chapter">파이썬 3 지원</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014 Pallets Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+
+  </body>
+</html>

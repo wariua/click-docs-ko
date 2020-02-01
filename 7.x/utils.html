@@ -1,0 +1,479 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>유틸리티 &#8212; 클릭 문서 (7.x)</title>
+    <link rel="stylesheet" href="_static/click.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/click-icon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Bash 완성 기능" href="bashcomplete.html" />
+    <link rel="prev" title="클릭 응용 테스트" href="testing.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="bashcomplete.html" title="Bash 완성 기능"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="testing.html" title="클릭 응용 테스트"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">클릭 문서 (7.x)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>유틸리티<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>클릭에서는 인자 파싱 및 처리를 다루기 위한 것 외에도 명령행 도구
+작성에 유용한 보조 기능들을 많이 제공한다.</p>
+<div class="section" id="stdout">
+<h2>stdout으로 출력하기<a class="headerlink" href="#stdout" title="Permalink to this headline">¶</a></h2>
+<p>가장 눈에 띄는 건 <a class="reference internal" href="api.html#click.echo" title="click.echo"><code class="xref py py-func docutils literal notranslate"><span class="pre">echo()</span></code></a> 함수인데, 여러 면에서 파이썬의
+<code class="docutils literal notranslate"><span class="pre">print</span></code> 문 내지 함수와 비슷하게 동작한다. 주된 차이는
+파이썬 2와 3에서 똑같이 동작하고, 잘못 구성된 출력 스트림을
+똑똑하게 탐지하며, 절대 실패하지 않는다는 (파이썬 3 제외.
+자세한 내용은 <a class="reference internal" href="python3.html#python3-limitations"><span class="std std-ref">파이썬 3에서의 제약 사항</span></a> 참고) 점이다.</p>
+<p>예:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+
+<span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>무엇보다 중요한 건 유니코드와 이진 데이터를 모두 찍을 수 있다는
+점이다. 파이썬의 내장 <code class="docutils literal notranslate"><span class="pre">print</span></code> 함수로는 아무 바이트나 출력할 수
+없다. 한편으로 끝에 개행을 기본적으로 찍는데, 막으려면
+<code class="docutils literal notranslate"><span class="pre">nl=False</span></code>를 주면 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xe2\x98\x83</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">nl</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>또한 <a class="reference internal" href="api.html#click.echo" title="click.echo"><code class="xref py py-func docutils literal notranslate"><span class="pre">echo()</span></code></a>에서는 stdout 및 stderr로 연결된 똑똑한
+클릭 내부 출력 스트림을 이용한다. 그래서 윈도우 콘솔에서
+유니코드 출력을 지원한다. 즉 <cite>click.echo</cite>만 이용하면
+유니코드 문자를 출력할 수 있다는 거다. (표시될 수
+있는 문자와 관련해 기본 폰트에 일부 제약이 있기는 하다.)
+이 기능은 클릭 6.0에서 추가됐다.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.</span></p>
+</div>
+<p>이제 윈도우에서 출력 스트림을 에뮬레이션 해서 별도 API를
+통해 윈도 콘솔에 유니코드 찍는 걸 지원한다. 자세한 내용은
+<a class="reference internal" href="wincmd.html"><span class="doc">윈도우 콘솔 관련 사항</span></a> 참고.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 3.0.</span></p>
+</div>
+<p>클릭 3.0부터는 <code class="docutils literal notranslate"><span class="pre">err=True</span></code>만 주면 손쉽게 표준 오류로
+출력할 수도 있다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">,</span> <span class="n">err</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ansi">
+<span id="ansi-colors"></span><h2>ANSI 색상<a class="headerlink" href="#ansi" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.0.</span></p>
+</div>
+<p>클릭 2.0부터 <a class="reference internal" href="api.html#click.echo" title="click.echo"><code class="xref py py-func docutils literal notranslate"><span class="pre">echo()</span></code></a> 함수에 ANSI 색상 및 스타일을 다룰 수
+있는 기능이 추가됐다. 참고로 윈도우에서는 <a class="reference external" href="https://pypi.org/project/colorama/">colorama</a>가 설치돼
+있는 경우에만 이 기능을 사용할 수 있다. 설치가 돼 있으면 ANSI
+코드를 똑똑하게 처리해 준다. 참고로 파이썬 2에서는 echo 함수가
+bytearray의 색상 코드 정보를 파싱 하지 않는다.</p>
+<p>크게 다음처럼 동작한다.</p>
+<ul class="simple">
+<li><p>스트림이 터미널에 연결돼 있지 않으면 클릭의 <a class="reference internal" href="api.html#click.echo" title="click.echo"><code class="xref py py-func docutils literal notranslate"><span class="pre">echo()</span></code></a>
+함수가 자동으로 ANSI 색상 코드를 벗겨 낸다.</p></li>
+<li><p>윈도우에서는 <a class="reference internal" href="api.html#click.echo" title="click.echo"><code class="xref py py-func docutils literal notranslate"><span class="pre">echo()</span></code></a> 함수가 알아서 터미널에 연결해서
+ANSI 코드를 터미널 API 호출로 변환해 준다. 즉 윈도우에서도
+다른 운영 체제와 마찬가지로 색상이 동작하게 된다.</p></li>
+</ul>
+<p><cite>colorama</cite> 지원 관련 참고: 클릭에서 자동으로 <cite>colorama</cite>가 있는지
+탐지해서 이용한다. <code class="docutils literal notranslate"><span class="pre">colorama.init()</span></code>을 <em>호출하지 말자</em>.</p>
+<p><cite>colorama</cite>를 설치하려면 다음 명령을 실행하면 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install colorama
+</pre></div>
+</div>
+<p>문자열 스타일을 바꾸려면 <a class="reference internal" href="api.html#click.style" title="click.style"><code class="xref py py-func docutils literal notranslate"><span class="pre">style()</span></code></a> 함수를 쓰면 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+
+<span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">click</span><span class="o">.</span><span class="n">style</span><span class="p">(</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">))</span>
+<span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">click</span><span class="o">.</span><span class="n">style</span><span class="p">(</span><span class="s1">&#39;Some more text&#39;</span><span class="p">,</span> <span class="n">bg</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">))</span>
+<span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">click</span><span class="o">.</span><span class="n">style</span><span class="p">(</span><span class="s1">&#39;ATTENTION&#39;</span><span class="p">,</span> <span class="n">blink</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bold</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="api.html#click.echo" title="click.echo"><code class="xref py py-func docutils literal notranslate"><span class="pre">echo()</span></code></a>와 <a class="reference internal" href="api.html#click.style" title="click.style"><code class="xref py py-func docutils literal notranslate"><span class="pre">style()</span></code></a>조합을 <a class="reference internal" href="api.html#click.secho" title="click.secho"><code class="xref py py-func docutils literal notranslate"><span class="pre">secho()</span></code></a>라는
+함수 하나로 대신할 수도 있다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+<span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s1">&#39;Some more text&#39;</span><span class="p">,</span> <span class="n">bg</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+<span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s1">&#39;ATTENTION&#39;</span><span class="p">,</span> <span class="n">blink</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bold</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>페이저 지원<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>어떤 경우에는 터미널에 긴 내용을 보여 주면서 사용자가 스크롤을
+할 수 있게 하고 싶을 수 있다. <a class="reference internal" href="api.html#click.echo_via_pager" title="click.echo_via_pager"><code class="xref py py-func docutils literal notranslate"><span class="pre">echo_via_pager()</span></code></a> 함수를
+쓰면 되는데, 이 함수는 <a class="reference internal" href="api.html#click.echo" title="click.echo"><code class="xref py py-func docutils literal notranslate"><span class="pre">echo()</span></code></a>와 비슷하게 동작하되
+항상 stdout으로, 그리고 가능하면 페이저를 통해서 출력한다.</p>
+<p>예:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">less</span><span class="p">():</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo_via_pager</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;Line </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">idx</span>
+                                   <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>내용이 많아서 페이저를 쓰고 싶은데 모든 내용을 미리 생성하는 건 시간이 많이 걸릴 것 같다면 문자열 대신 제너레이터를 (즉 제너레이터 함수를) 줄 수 있다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_generate_output</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50000</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="s2">&quot;Line </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">idx</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">less</span><span class="p">():</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo_via_pager</span><span class="p">(</span><span class="n">_generate_output</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>화면 비우기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.0.</span></p>
+</div>
+<p>터미널 화면을 비우려면 클릭 2.0부터 제공되는 <a class="reference internal" href="api.html#click.clear" title="click.clear"><code class="xref py py-func docutils literal notranslate"><span class="pre">clear()</span></code></a> 함수를
+사용하면 된다. 이름처럼 동작한다. 즉 플랫폼이 뭐든 간에 보이는
+화면 전체를 비워 준다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+<span class="n">click</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>터미널에서 문자 얻기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.0.</span></p>
+</div>
+<p>보통 터미널에서 입력을 읽을 때는 표준 입력에서 읽어 들이게 된다.
+하지만 그건 버퍼링 입력이고 행이 종결돼야 내용이 나오게 된다.
+어떤 경우에는 그렇게 하는 대신 개별 문자를 바로바로 읽고 싶을
+수 있다.</p>
+<p>이를 위해 클릭에서 <a class="reference internal" href="api.html#click.getchar" title="click.getchar"><code class="xref py py-func docutils literal notranslate"><span class="pre">getchar()</span></code></a> 함수를 제공하는데, 터미널
+버퍼에서 문자 하나를 읽어서 유니코드 문자로 반환한다.</p>
+<p>참고로 이 함수는 stdin이 파이프인 경우에도 항상 터미널에서
+읽는다.</p>
+<p>예:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+
+<span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Continue? [yn] &#39;</span><span class="p">,</span> <span class="n">nl</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">getchar</span><span class="p">()</span>
+<span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;We will go on&#39;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;n&#39;</span><span class="p">:</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Abort!&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Invalid input :(&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>참고로 이렇게 하면 입력을 있는 그대로 읽어 들이며, 그래서 방향 키
+같은 게 플랫폼별 이스케이프 형식으로 찍히게 된다. 유일하게 처리를
+하는 문자가 <code class="docutils literal notranslate"><span class="pre">^C</span></code>와 <code class="docutils literal notranslate"><span class="pre">^D</span></code>인데, 각각 키보드 인터럽트와 파일 끝
+예외로 바뀐다. 이렇게 하는 이유는 안 그러면 미처 생각을 못 해서
+제대로 끝낼 방법이 없는 스크립트를 만들게 되기 십상이기 때문이다.</p>
+</div>
+<div class="section" id="id5">
+<h2>키 입력 기다리기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.0.</span></p>
+</div>
+<p>사용자가 키보드의 아무 키나 누를 때까지 실행을 정지하는 게 유용할
+때가 있다. 특히 윈도우에서 유용한데, <code class="docutils literal notranslate"><span class="pre">cmd.exe</span></code>가 기본적으로
+명령 실행을 마친 후 기다리지 않고 바로 창을 닫기 때문이다.</p>
+<p>클릭에서는 <a class="reference internal" href="api.html#click.pause" title="click.pause"><code class="xref py py-func docutils literal notranslate"><span class="pre">pause()</span></code></a> 함수를 쓰면 된다. 이 함수는 (변경 가능한)
+짧은 메시지를 터미널에 표시하고서 사용자가 키를 누를 때까지
+기다린다. 더불어 스크립트가 대화형으로 돌고 있는 게 아닌 경우에는
+NOP(빈 연산)이 된다.</p>
+<p>예:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+<span class="n">click</span><span class="o">.</span><span class="n">pause</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id6">
+<h2>편집기 띄우기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.0.</span></p>
+</div>
+<p>클릭에선 <a class="reference internal" href="api.html#click.edit" title="click.edit"><code class="xref py py-func docutils literal notranslate"><span class="pre">edit()</span></code></a>를 통해 자동으로 편집기를 띄울 수 있다.
+사용자에게 여러 행으로 된 입력을 요청할 때 아주 유용하다.
+사용자가 지정한 편집기가 있으면 그걸 자동으로 열고, 없으면
+적당한 기본값을 쓰게 된다. 사용자가 저장 없이 편집기를 닫으면
+반환 값이 <cite>None</cite>이고 아니면 입력한 텍스트다.</p>
+<p>사용례:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+
+<span class="k">def</span> <span class="nf">get_commit_message</span><span class="p">():</span>
+    <span class="n">MARKER</span> <span class="o">=</span> <span class="s1">&#39;# Everything below is ignored</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">MARKER</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">message</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">MARKER</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>또는 파일명을 지정해서 그 파일에 대해 편집기를 띄우게 쓸
+수도 있다. 그 경우에는 반환 값이 항상 <cite>None</cite>이다.</p>
+<p>사용례:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+<span class="n">click</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;/etc/passwd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h2>응용 띄우기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.0.</span></p>
+</div>
+<p>클릭에선 <a class="reference internal" href="api.html#click.launch" title="click.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">launch()</span></code></a>를 통해 응용을 띄울 수 있다. 이를 이용해
+어떤 URL이나 파일 타입에 연계된 기본 응용을 열 수 있다. 예를 들면
+이를 이용해 웹 브라우저나 그림 뷰어를 띄울 수 있다. 더불어 파일
+관리자를 열면서 지정한 파일이 자동으로 선택돼 있게 할 수 있다.</p>
+<p>사용례:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">click</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="s2">&quot;https://click.palletsprojects.com/&quot;</span><span class="p">)</span>
+<span class="n">click</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="s2">&quot;/my/downloaded/file.txt&quot;</span><span class="p">,</span> <span class="n">locate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id8">
+<h2>파일명 찍기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<p>파일명이 유니코드가 아닐 수도 있기 때문에 서식 문자열에 사용하기가
+좀 까다로울 수 있다. 일반적으로 파이썬 2에서 더 간단한데,
+바이트들을 <code class="docutils literal notranslate"><span class="pre">print</span></code> 함수로 stdout에 그냥 쓸 수 있기 때문이다.
+하지만 파이썬 3에서는 항상 유니코드로 해야 한다.</p>
+<p>이를 위해 클릭에는 <a class="reference internal" href="api.html#click.format_filename" title="click.format_filename"><code class="xref py py-func docutils literal notranslate"><span class="pre">format_filename()</span></code></a> 함수가 있다.
+최선을 다해 파일명을 유니코드로 변환해 주며 절대 실패하지
+않는다. 그래서 그 파일명을 유니코드 문자열 맥락에 사용할 수
+있게 해 준다.</p>
+<p>예:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Path: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">click</span><span class="o">.</span><span class="n">format_filename</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;foo.txt&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id9">
+<h2>표준 스트림<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<p>명령행 도구에서는 입력 스트림과 출력 스트림에 잘 접근하는 게
+아주 중요하다. 파이썬에서 기본적으로 <code class="docutils literal notranslate"><span class="pre">sys.stdout</span></code> 등을 통해
+스트림에 접근할 수 있지만 아쉽게도 2.x와 3.x 간에 API 차이가
+있으며 특히 유니코드와 이진 데이터에 스트림이 반응하는 방식이
+다르다.</p>
+<p>이 때문에 클릭에는 <a class="reference internal" href="api.html#click.get_binary_stream" title="click.get_binary_stream"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_binary_stream()</span></code></a> 및
+<a class="reference internal" href="api.html#click.get_text_stream" title="click.get_text_stream"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_text_stream()</span></code></a> 함수가 있는데, 상이한 파이썬 버전과
+다양한 터미널 구성에서도 일관성 있는 결과를 내놓는다.</p>
+<p>결론은 이 함수들이 항상 잘 동작하는 스트림 객체를 반환해
+준다는 것이다. (파이썬 3의 아주 특이한 경우 제외.
+<a class="reference internal" href="python3.html#python3-limitations"><span class="std std-ref">파이썬 3에서의 제약 사항</span></a> 참고.)</p>
+<p>예:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+
+<span class="n">stdin_text</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">get_text_stream</span><span class="p">(</span><span class="s1">&#39;stdin&#39;</span><span class="p">)</span>
+<span class="n">stdout_binary</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">get_binary_stream</span><span class="p">(</span><span class="s1">&#39;stdout&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.</span></p>
+</div>
+<p>이제 클릭은 윈도우에서 출력 스트림을 에뮬레이션 해서 별도
+API를 통해 윈도우 콘솔로 유니코드를 찍을 수 있다. 자세한
+내용은 <a class="reference internal" href="wincmd.html"><span class="doc">윈도우 콘솔 관련 사항</span></a> 참고.</p>
+</div>
+<div class="section" id="id10">
+<h2>똑똑한 파일 열기<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 3.0.</span></p>
+</div>
+<p>클릭 3.0부터 <a class="reference internal" href="api.html#click.File" title="click.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">File</span></code></a> 타입의 파일 여는 로직을
+<a class="reference internal" href="api.html#click.open_file" title="click.open_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">open_file()</span></code></a> 함수를 통해서도 이용할 수 있다. 다른 파일뿐
+아니라 stdin/stdout도 똑똑하게 열어 준다.</p>
+<p>예:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+
+<span class="n">stdout</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<span class="n">test_file</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="s1">&#39;test.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>stdin이나 stdout이 반환되는 경우 그 반환 값이 특별한 파일로
+감싸져 있어서 문맥 관리자에서 파일이 닫히지 않도록 한다.
+그래서 표준 스트림 처리가 투명해져서 언제나 다음처럼
+쓸 수 있게 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">click</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Hello World!</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id11">
+<h2>응용 폴더 찾기<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.0.</span></p>
+</div>
+<p>응용에서 자기 설정 파일을 열고 싶을 때가 자주 있다. 하지만
+운영 체제에서는 각자의 표준에 따라 각기 다른 위치에 설정
+파일들을 저장한다. 클릭에서 제공하는 <a class="reference internal" href="api.html#click.get_app_dir" title="click.get_app_dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_app_dir()</span></code></a>
+함수는 OS에 따라서 응용의 사용자별 설정 파일에 가장 적합한
+위치를 반환한다.</p>
+<p>사용례:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">import</span> <span class="nn">ConfigParser</span>
+
+<span class="n">APP_NAME</span> <span class="o">=</span> <span class="s1">&#39;My Application&#39;</span>
+
+<span class="k">def</span> <span class="nf">read_config</span><span class="p">():</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">click</span><span class="o">.</span><span class="n">get_app_dir</span><span class="p">(</span><span class="n">APP_NAME</span><span class="p">),</span> <span class="s1">&#39;config.ini&#39;</span><span class="p">)</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">RawConfigParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">read</span><span class="p">([</span><span class="n">cfg</span><span class="p">])</span>
+    <span class="n">rv</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">sections</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
+            <span class="n">rv</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">key</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">rv</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id12">
+<h2>진행 막대 보여 주기<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.0.</span></p>
+</div>
+<p>명령행 스크립트에서 많은 양의 데이터를 처리해야 하는데 걸릴
+시간과 관련해 진행 상태를 사용자에게 빨리 보여 주고 싶을
+때가 있다. 클릭에서는 <a class="reference internal" href="api.html#click.progressbar" title="click.progressbar"><code class="xref py py-func docutils literal notranslate"><span class="pre">progressbar()</span></code></a> 함수를 통해
+간단한 진행 막대를 표시할 수 있도록 한다.</p>
+<p>기본적인 사용법은 아주 간단하다. 동작을 수행하려는 이터러블이
+있으면 된다. 이터러블의 각 항목에 대해서 처리에 얼마간의 시간이
+걸릴 수 있다. 가령 다음과 같은 루프가 있다고 하자.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">all_the_users_to_process</span><span class="p">:</span>
+    <span class="n">modify_the_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>이걸 가지고 자동으로 진행 막대가 갱신되게 하려면 코드를
+다음처럼 바꿔 주기만 하면 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+
+<span class="k">with</span> <span class="n">click</span><span class="o">.</span><span class="n">progressbar</span><span class="p">(</span><span class="n">all_the_users_to_process</span><span class="p">)</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">bar</span><span class="p">:</span>
+        <span class="n">modify_the_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>그러면 클릭에서 자동으로 진행 막대를 터미널에 표시하고 남은
+시간을 계산해 준다. 남은 시간 계산을 위해선 이터러블에
+길이가 있어야 한다. 이터러블에 길이가 없지만 길이를 알고
+있다면 명시적으로 알려 줄 수 있다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">click</span><span class="o">.</span><span class="n">progressbar</span><span class="p">(</span><span class="n">all_the_users_to_process</span><span class="p">,</span>
+                       <span class="n">length</span><span class="o">=</span><span class="n">number_of_users</span><span class="p">)</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">bar</span><span class="p">:</span>
+        <span class="n">modify_the_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>또 다른 유용한 기능은 진행 막대에 레이블을 붙이는 것이다.
+진행 막대 앞에 나오게 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">click</span><span class="o">.</span><span class="n">progressbar</span><span class="p">(</span><span class="n">all_the_users_to_process</span><span class="p">,</span>
+                       <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Modifying user accounts&#39;</span><span class="p">,</span>
+                       <span class="n">length</span><span class="o">=</span><span class="n">number_of_users</span><span class="p">)</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">bar</span><span class="p">:</span>
+        <span class="n">modify_the_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>때로는 외부 이터레이터를 순회하면서 불규칙적으로 진행 막대를
+진행시켜야 한다. 그렇게 하려면 (이터레이터 없이) 길이를
+지정하고서 반환 값을 직접 순회하는 대신 update 메소드를
+사용하면 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">click</span><span class="o">.</span><span class="n">progressbar</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
+                       <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Unzipping archive&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">archive</span> <span class="ow">in</span> <span class="n">zip_file</span><span class="p">:</span>
+        <span class="n">archive</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span>
+        <span class="n">bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">archive</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/click-logo-sidebar.png" alt="Logo"/>
+            </a></p>
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">유틸리티</a><ul>
+<li><a class="reference internal" href="#stdout">stdout으로 출력하기</a></li>
+<li><a class="reference internal" href="#ansi">ANSI 색상</a></li>
+<li><a class="reference internal" href="#id2">페이저 지원</a></li>
+<li><a class="reference internal" href="#id3">화면 비우기</a></li>
+<li><a class="reference internal" href="#id4">터미널에서 문자 얻기</a></li>
+<li><a class="reference internal" href="#id5">키 입력 기다리기</a></li>
+<li><a class="reference internal" href="#id6">편집기 띄우기</a></li>
+<li><a class="reference internal" href="#id7">응용 띄우기</a></li>
+<li><a class="reference internal" href="#id8">파일명 찍기</a></li>
+<li><a class="reference internal" href="#id9">표준 스트림</a></li>
+<li><a class="reference internal" href="#id10">똑똑한 파일 열기</a></li>
+<li><a class="reference internal" href="#id11">응용 폴더 찾기</a></li>
+<li><a class="reference internal" href="#id12">진행 막대 보여 주기</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="testing.html" title="previous chapter">클릭 응용 테스트</a>
+          <li>Next: <a href="bashcomplete.html" title="next chapter">Bash 완성 기능</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014 Pallets Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+
+  </body>
+</html>

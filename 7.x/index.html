@@ -1,0 +1,370 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>클릭을 클릭 &#8212; 클릭 문서 (7.x)</title>
+    <link rel="stylesheet" href="_static/click.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/click-icon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="왜 클릭이어야 하나?" href="why.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="why.html" title="왜 클릭이어야 하나?"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">클릭 문서 (7.x)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="hide-header section" id="id1">
+<h1>클릭을 클릭<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://palletsprojects.com/p/click/"><img alt="_images/click-logo.png" class="align-center" src="_images/click-logo.png" style="width: 420.0px; height: 175.0px;" /></a>
+<p>클릭(Click)은 꼭 필요한 코드만으로 아름다운 명령행 인터페이스를
+조합할 수 있는 파이썬 패키지다. “Command Line Interface Creation Kit”을
+줄인 이름이다. 폭넓은 설정이 가능하면서도 적절한 기본값이 갖춰져 있다.</p>
+<p>명령행 도구 작성 작업을 빠르고 재밌게 만들어 주면서도 원하는 CLI API를
+구현할 수 없어서 좌절하는 일이 없도록 하는 걸 목표로 한다.</p>
+<p>클릭에는 세 가지 특징이 있다.</p>
+<ul class="simple">
+<li><p>마음대로 명령 계층 만들기</p></li>
+<li><p>도움말 자동 생성</p></li>
+<li><p>하위 모듈 런타임 적재 지원</p></li>
+</ul>
+<p>다음은 간단한 클릭 프로그램 예시다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--count&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;인사 횟수.&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--name&#39;</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;이름&#39;</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;인사를 받을 사람.&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;NAME에게 COUNT 번 인사를 하는 간단한 프로그램&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Hello </span><span class="si">%s</span><span class="s1">!&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">hello</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>실행하면 다음과 같이 된다.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ python hello.py --count=3
+이름: John
+Hello John!
+Hello John!
+Hello John!
+</pre></div>
+</div>
+<p>자동으로 멋진 형식의 도움말을 만들어 준다.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ python hello.py --help
+Usage: hello.py [OPTIONS]
+
+  NAME에게 COUNT 번 인사를 하는 간단한 프로그램
+
+Options:
+  --count INTEGER  인사 횟수.
+  --name TEXT      인사를 받을 사람.
+  --help           Show this message and exit.
+</pre></div>
+</div>
+<p>PyPI에서 바로 라이브러리를 받을 수 있다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">click</span>
+</pre></div>
+</div>
+<div class="section" id="id2">
+<h2>기본 문서<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>라이브러리 사용 패턴 모두를 차례로 설명한다.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="why.html">왜 클릭이어야 하나?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="why.html#argparse">argparse는 왜 아닌가?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="why.html#docopt">docopt 등은 왜 아닌가?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="why.html#id3">왜 동작을 하드코딩 했나?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="why.html#id4">왜 자동 정정을 안 하나?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">빨리 해 보기</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#virtualenv">virtualenv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#id3">스크린캐스트와 예시</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#id10">기본 개념 - 명령 만들기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#echo">echo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#id11">명령 계층화</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#id12">매개변수 추가하기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#setuptools">setuptools로 바꾸기</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="setuptools.html">setuptools 사용</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setuptools.html#id1">도입</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setuptools.html#id2">스크립트 테스트</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setuptools.html#id3">패키지 형태 스크립트</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">매개변수</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html#id2">차이점</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html#id3">매개변수 타입</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html#parameter-names">매개변수 이름</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html#id5">새로운 타입 구현하기</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">옵션</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id2">옵션 이름</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id3">기본 값 옵션</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id4">여러 값 옵션</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#tuple-type">여러 값 튜플 옵션</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id6">다중 옵션</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id7">개수 세기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id8">불리언 플래그</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id9">기능 스위치</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#choice-opts">선택 옵션</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#option-prompting">값 묻기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id12">패스워드 묻기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id13">동적 프롬프트 기본값</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id14">콜백과 긴급 옵션</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#yes">Yes 매개변수</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id15">환경 변수에서 값 얻기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id16">환경 값에서 여러 값 얻기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id17">다른 시작 문자</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#ranges">범위 옵션</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#id19">검증 콜백</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="arguments.html">인자</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="arguments.html#id2">기본 인자</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arguments.html#id3">가변 개수 인자</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arguments.html#file-args">파일 인자</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arguments.html#id5">파일 경로 인자</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arguments.html#id6">파일 열기의 안전성</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arguments.html#id7">환경 변수</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arguments.html#id8">옵션 같은 인자</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">명령과 그룹</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#id2">콜백 호출</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#id3">매개변수 전달</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#id4">계층 처리와 문맥</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#id5">명령 데코레이터</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#id6">명령 없이 그룹 호출하기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#custom-multi-commands">새로운 다중 명령</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#id8">다중 명령 병합</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#multi-command-chaining">다중 명령 연속 지정</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#id10">다중 명령 파이프라인</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#id11">기본값 바꾸기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#id12">문맥 기본값</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#id13">명령 반환 값</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="prompts.html">사용자 입력 프롬프트</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="prompts.html#id2">옵션 프롬프트</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prompts.html#id3">입력 프롬프트</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prompts.html#id4">확인 프롬프트</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">스크립트 문서화</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#id2">도움말</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#id3">자동 줄 바꿈 막기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#doc-meta-variables">도움말 잘라내기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#id5">메타 변수</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#id6">짧은 명령 도움말</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#id7">도움말 동작 바꾸기</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="complex.html">복잡한 응용</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="complex.html#id2">기본 개념</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex.html#git-clone">git clone 만들기</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">고급 패턴</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#aliases">명령 별칭</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#id3">매개변수 조작</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#id4">토큰 정규화</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#id5">다른 명령 호출하기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#callback-evaluation-order">콜백 평가 순서</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#forwarding-unknown-options">모르는 옵션 전달</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#id8">전역 문맥 접근</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">클릭 응용 테스트</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#id2">기본 테스트</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#id3">파일 시스템 격리</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#id4">입력 스트림</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">유틸리티</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#stdout">stdout으로 출력하기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#ansi">ANSI 색상</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#id2">페이저 지원</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#id3">화면 비우기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#id4">터미널에서 문자 얻기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#id5">키 입력 기다리기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#id6">편집기 띄우기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#id7">응용 띄우기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#id8">파일명 찍기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#id9">표준 스트림</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#id10">똑똑한 파일 열기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#id11">응용 폴더 찾기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#id12">진행 막대 보여 주기</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bashcomplete.html">Bash 완성 기능</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bashcomplete.html#id1">제약 사항</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bashcomplete.html#id2">완성 대상</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bashcomplete.html#zsh">완성 도움말 문자열 (ZSH 한정)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bashcomplete.html#id3">활성화</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bashcomplete.html#id4">활성화 스크립트</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">예외 처리</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html#id2">어디서 오류를 처리하는가?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html#id3">그렇게 하기 싫으면?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html#id4">어떤 예외들이 있는가?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python3.html">파이썬 3 지원</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python3.html#python3-limitations">파이썬 3에서의 제약 사항</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python3.html#id3">파이썬 2와 3에서의 차이점</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python3.html#python3-surrogates">파이썬 3 서로게이트 문자 처리</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python3.html#id5">유니코드 리터럴</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wincmd.html">윈도우 콘솔 관련 사항</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wincmd.html#id2">유니코드 인자</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wincmd.html#id3">유니코드 입출력</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="api">
+<h2>API 참조 문서<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
+<p>특정 함수나 클래스, 메소드에 대한 내용을 찾는다면 여기를 보면 된다</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#id1">데코레이터</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#id2">유틸리티</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#id3">명령</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#id4">매개변수</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#id5">문맥</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#id6">타입</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#id7">예외</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#id8">서식</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#id9">파싱</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#id10">테스트</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>기타 페이지<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contrib.html">click-contrib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Click Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-7-0">Version 7.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-6-7">Version 6.7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-6-6">Version 6.6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-6-4">Version 6.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-6-3">Version 6.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-6-2">Version 6.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-6-1">Version 6.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-6-0">Version 6.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-5-1">Version 5.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-5-0">Version 5.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-4-1">Version 4.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-4-0">Version 4.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-3-3">Version 3.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-3-2">Version 3.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-3-1">Version 3.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-3-0">Version 3.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-2-6">Version 2.6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-2-5">Version 2.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-2-4">Version 2.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-2-3">Version 2.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-2-2">Version 2.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-2-1">Version 2.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-2-0">Version 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-1">Version 1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-0">Version 1.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">최신 릴리스로 업그레이드 하기</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="upgrading.html#upgrade-to-3-2">3.2 업그레이드</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upgrading.html#upgrade-to-2-0">2.0 업그레이드</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">라이선스</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="license.html#id2">라이선스 본문</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+
+  <h3>Project Links</h3>
+  <ul>
+    <li><a href="https://palletsprojects.com/donate">Pallets에 후원하기</a>
+  
+    <li><a href="https://palletsprojects.com/p/click/">클릭 웹사이트</a>
+  
+    <li><a href="https://pypi.org/project/Click/">PyPI 릴리스</a>
+  
+    <li><a href="https://github.com/pallets/click/">소스 코드</a>
+  
+    <li><a href="https://github.com/pallets/click/issues/">이슈 트래커</a>
+  </ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014 Pallets Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+
+  </body>
+</html>

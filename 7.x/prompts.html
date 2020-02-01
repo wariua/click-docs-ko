@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>사용자 입력 프롬프트 &#8212; 클릭 문서 (7.x)</title>
+    <link rel="stylesheet" href="_static/click.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/click-icon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="스크립트 문서화" href="documentation.html" />
+    <link rel="prev" title="명령과 그룹" href="commands.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="documentation.html" title="스크립트 문서화"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="commands.html" title="명령과 그룹"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">클릭 문서 (7.x)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>사용자 입력 프롬프트<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>클릭에선 두 가지 위치에서 프롬프트를 지원한다. 첫째는 매개변수
+처리가 이뤄질 때의 자동 프롬프트고, 둘째는 이후 독립적으로
+묻는 프롬프트다.</p>
+<p>타입에 따른 유효한 입력을 요구하는 <a class="reference internal" href="api.html#click.prompt" title="click.prompt"><code class="xref py py-func docutils literal notranslate"><span class="pre">prompt()</span></code></a> 함수와
+확인(yes/no)을 요구하는 <a class="reference internal" href="api.html#click.confirm" title="click.confirm"><code class="xref py py-func docutils literal notranslate"><span class="pre">confirm()</span></code></a> 함수를 쓴다.</p>
+<div class="section" id="id2">
+<h2>옵션 프롬프트<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>옵션 프롬프트는 옵션 인터페이스 내에 통합돼 있다. 자세한
+내용은 <a class="reference internal" href="options.html#option-prompting"><span class="std std-ref">값 묻기</span></a> 참고. 내부에서 자동으로
+<a class="reference internal" href="api.html#click.prompt" title="click.prompt"><code class="xref py py-func docutils literal notranslate"><span class="pre">prompt()</span></code></a>와 <a class="reference internal" href="api.html#click.confirm" title="click.confirm"><code class="xref py py-func docutils literal notranslate"><span class="pre">confirm()</span></code></a> 중 필요한 쪽을 호출한다.</p>
+</div>
+<div class="section" id="id3">
+<h2>입력 프롬프트<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>사용자 입력을 수동으로 요청하는 데 <a class="reference internal" href="api.html#click.prompt" title="click.prompt"><code class="xref py py-func docutils literal notranslate"><span class="pre">prompt()</span></code></a> 함수를
+쓸 수 있다. 기본적으로 유니코드 문자열을 받지만 다른 타입을
+요청할 수도 있다. 예를 들어 유효한 정수를 요청할 수 있다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span><span class="s1">&#39;Please enter a valid integer&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>또한 기본값을 주는 경우에는 타입을 자동으로 결정하게 된다.
+예를 들어 다음처럼 하면 실수만 받게 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span><span class="s1">&#39;Please enter a number&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">42.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>확인 프롬프트<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>사용자가 어떤 동작을 계속 진행하려는지 묻는 데는
+<a class="reference internal" href="api.html#click.confirm" title="click.confirm"><code class="xref py py-func docutils literal notranslate"><span class="pre">confirm()</span></code></a> 함수가 요긴하다. 기본적으로 질의 결과를
+불리언 값으로 반환한다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">click</span><span class="o">.</span><span class="n">confirm</span><span class="p">(</span><span class="s1">&#39;Do you want to continue?&#39;</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Well done!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>함수가 <code class="docutils literal notranslate"><span class="pre">True</span></code>를 반환하지 않는 경우 프로그램 실행을
+자동으로 멈추도록 하는 동작 방식도 있다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">click</span><span class="o">.</span><span class="n">confirm</span><span class="p">(</span><span class="s1">&#39;Do you want to continue?&#39;</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/click-logo-sidebar.png" alt="Logo"/>
+            </a></p>
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">사용자 입력 프롬프트</a><ul>
+<li><a class="reference internal" href="#id2">옵션 프롬프트</a></li>
+<li><a class="reference internal" href="#id3">입력 프롬프트</a></li>
+<li><a class="reference internal" href="#id4">확인 프롬프트</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="commands.html" title="previous chapter">명령과 그룹</a>
+          <li>Next: <a href="documentation.html" title="next chapter">스크립트 문서화</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014 Pallets Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+
+  </body>
+</html>

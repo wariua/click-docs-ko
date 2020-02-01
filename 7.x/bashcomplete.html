@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bash 완성 기능 &#8212; 클릭 문서 (7.x)</title>
+    <link rel="stylesheet" href="_static/click.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/click-icon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="예외 처리" href="exceptions.html" />
+    <link rel="prev" title="유틸리티" href="utils.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="exceptions.html" title="예외 처리"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="유틸리티"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">클릭 문서 (7.x)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bash">
+<h1>Bash 완성 기능<a class="headerlink" href="#bash" title="Permalink to this headline">¶</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 2.0.</span></p>
+</div>
+<p>클릭 2.0부터는 모든 클릭 스크립트에 대한 Bash 완성 지원이
+내장돼 있다. 완성 기능을 사용할 수 있는 경우에 대한 어떤 제약이
+있기는 하지만 대부분은 바로 동작할 것이다.</p>
+<div class="section" id="id1">
+<h2>제약 사항<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>스크립트가 제대로 설치돼 있고 <code class="docutils literal notranslate"><span class="pre">python</span></code> 명령을 통해 실행되는
+게 아닐 때만 Bash 완성 기능을 쓸 수 있다. 설치 방법에 대해선
+<a class="reference internal" href="setuptools.html#setuptools-integration"><span class="std std-ref">setuptools 사용</span></a> 절을 보라. 클릭에서는 현재
+Bash 및 Zsh의 완성 기능만 지원한다.</p>
+</div>
+<div class="section" id="id2">
+<h2>완성 대상<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>일반적으로 말해 Bash 완성 지원은 하위 명령, 옵션, 그리고
+타입이 click.Choice인 옵션 및 인자의 값을 완성하게 된다.
+하위 명령과 선택 값들은 항상 나열하는 반면 옵션은 대시를 최소
+하나 준 경우에만 보여 준다. 예:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ repo &lt;TAB&gt;&lt;TAB&gt;
+clone    commit   copy     delete   setuser
+$ repo clone -&lt;TAB&gt;&lt;TAB&gt;
+--deep     --help     --rev      --shallow  -r
+</pre></div>
+</div>
+<p>추가로 인자와 옵션에 <code class="docutils literal notranslate"><span class="pre">autocompletion</span></code> 매개변수를 줘서 다른
+내용을 제안할 수도 있다. <code class="docutils literal notranslate"><span class="pre">autocompletion</span></code>은 문자열
+리스트를 반환하는 콜백 함수여야 한다. 제안 목록을 Bash
+완성 시점에 동적으로 생성해야 할 때 유용하다. 콜백 함수는
+키워드 인자 3개를 받게 된다.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ctx</span></code> - 현재 클릭 문맥.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">args</span></code> - 받은 인자들 목록.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">incomplete</span></code> - 완성 중인 부분 단어 문자열.
+아직 문자를 입력하지 않았으면 빈 문자열 <code class="docutils literal notranslate"><span class="pre">''</span></code>일 수도 있다.</p></li>
+</ul>
+<p>다음은 콜백 함수를 써서 동적으로 제안 목록을 만들어 내는 예이다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="k">def</span> <span class="nf">get_env_vars</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">incomplete</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">incomplete</span> <span class="ow">in</span> <span class="n">k</span><span class="p">]</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s2">&quot;envvar&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">autocompletion</span><span class="o">=</span><span class="n">get_env_vars</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cmd1</span><span class="p">(</span><span class="n">envvar</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;환경 변수: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">envvar</span><span class="p">)</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;값: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">envvar</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="zsh">
+<h2>완성 도움말 문자열 (ZSH 한정)<a class="headerlink" href="#zsh" title="Permalink to this headline">¶</a></h2>
+<p>ZSH에서는 완성 항목에 대한 도움말 문자열을 보여 주는 걸 지원한다.
+옵션과 하위 명령의 도움말 매개변수에서 그 문자열들을 얻는다.
+동적으로 완성 항목을 생성하는 경우에는 문자열 대신 튜플을 반환해서
+도움말 문자열을 제공할 수 있다. 튜플의 첫 항목이 완성 문자열이고
+두 번째가 표시할 도움말 문자열이다.</p>
+<p>다음은 콜백 함수를 써서 동적으로 도움말 문자열이 있는 제안 목록을 만들어 내는 예이다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="k">def</span> <span class="nf">get_colors</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">incomplete</span><span class="p">):</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;빨간색에 대한 도움말 문자열&#39;</span><span class="p">),</span>
+              <span class="p">(</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;파란색에 대한 도움말 문자열&#39;</span><span class="p">),</span>
+              <span class="p">(</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;녹색에 대한 도움말 문자열&#39;</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors</span> <span class="k">if</span> <span class="n">incomplete</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">autocompletion</span><span class="o">=</span><span class="n">get_colors</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cmd1</span><span class="p">(</span><span class="n">color</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;선택한 색상: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">color</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>활성화<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>Bash 완성을 활성화하려면 스크립트에 완성 기능을 사용할 수 있다는
+걸 Bash에게 알려 줘야 하며, 완성 방법도 알려 줘야 한다. 모든 클릭
+응용에는 그에 대한 지원이 기본으로 포함돼 있다. 일반적으로
+<code class="docutils literal notranslate"><span class="pre">_&lt;PROG_NAME&gt;_COMPLETE</span></code>이라는 특수 환경 변수를 통해 동작하게
+되는데, 여기서 <code class="docutils literal notranslate"><span class="pre">&lt;PROG_NAME&gt;</span></code>은 응용 실행 파일 이름을 대문자로
+하고 대시를 밑줄로 바꾼 것이다.</p>
+<p>작성한 도구 이름이 <code class="docutils literal notranslate"><span class="pre">foo-bar</span></code>라면 특수 변수 이름은
+<code class="docutils literal notranslate"><span class="pre">_FOO_BAR_COMPLETE</span></code>이다. 이 변수를 <code class="docutils literal notranslate"><span class="pre">source</span></code> 값으로
+내보이면 활성화 스크립트를 내놓게 되므로 간단히 활성화할 수 있다.</p>
+<p>예를 들어 <code class="docutils literal notranslate"><span class="pre">foo-bar</span></code> 스크립트에 대해 Bash 완성을 켜고 싶다면
+<code class="docutils literal notranslate"><span class="pre">.bashrc</span></code>에 다음을 넣어 주면 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">eval</span> <span class="s2">&quot;$(_FOO_BAR_COMPLETE=source foo-bar)&quot;</span>
+</pre></div>
+</div>
+<p>zsh 사용자라면 <code class="docutils literal notranslate"><span class="pre">.zshrc</span></code>에 다음을 추가하면 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">eval</span> <span class="s2">&quot;$(_FOO_BAR_COMPLETE=source_zsh foo-bar)&quot;</span>
+</pre></div>
+</div>
+<p>그러면 이제 스크립트에 자동 완성이 켜지게 된다.</p>
+</div>
+<div class="section" id="id4">
+<h2>활성화 스크립트<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>위의 활성화 예시에서는 셸 시작 때마다 응용을 호출하게 된다.
+따라서 응용 수가 많으면 셸이 뜨는 게 상당히 느려질 수도 있다.
+그렇게 하는 대신 그 내용물을 담은 파일을 제공할 수도 있을
+텐데, Git과 여타 시스템에서 그렇게 하고 있다.</p>
+<p>간단히 가능하다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_FOO_BAR_COMPLETE</span><span class="o">=</span><span class="n">source</span> <span class="n">foo</span><span class="o">-</span><span class="n">bar</span> <span class="o">&gt;</span> <span class="n">foo</span><span class="o">-</span><span class="n">bar</span><span class="o">-</span><span class="n">complete</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>zsh인 경우:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_FOO_BAR_COMPLETE</span><span class="o">=</span><span class="n">source_zsh</span> <span class="n">foo</span><span class="o">-</span><span class="n">bar</span> <span class="o">&gt;</span> <span class="n">foo</span><span class="o">-</span><span class="n">bar</span><span class="o">-</span><span class="n">complete</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>그러고 나선 .bashrc나 .zshrc에 다음을 대신 넣어 주게 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">.</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">foo</span><span class="o">-</span><span class="n">bar</span><span class="o">-</span><span class="n">complete</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/click-logo-sidebar.png" alt="Logo"/>
+            </a></p>
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">Bash 완성 기능</a><ul>
+<li><a class="reference internal" href="#id1">제약 사항</a></li>
+<li><a class="reference internal" href="#id2">완성 대상</a></li>
+<li><a class="reference internal" href="#zsh">완성 도움말 문자열 (ZSH 한정)</a></li>
+<li><a class="reference internal" href="#id3">활성화</a></li>
+<li><a class="reference internal" href="#id4">활성화 스크립트</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="utils.html" title="previous chapter">유틸리티</a>
+          <li>Next: <a href="exceptions.html" title="next chapter">예외 처리</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014 Pallets Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+
+  </body>
+</html>

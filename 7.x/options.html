@@ -1,0 +1,829 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>옵션 &#8212; 클릭 문서 (7.x)</title>
+    <link rel="stylesheet" href="_static/click.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/click-icon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="인자" href="arguments.html" />
+    <link rel="prev" title="매개변수" href="parameters.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="arguments.html" title="인자"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="parameters.html" title="매개변수"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">클릭 문서 (7.x)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="options">
+<span id="id1"></span><h1>옵션<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="api.html#click.option" title="click.option"><code class="xref py py-func docutils literal notranslate"><span class="pre">option()</span></code></a> 데코레이터를 이용해 명령에 옵션을 추가할 수 있다.
+옵션들의 형태는 다양하므로 동작 방식을 설정하기 위한 매개변수들이
+여럿 있다. 클릭에서는 옵션과 <a class="reference internal" href="arguments.html#arguments"><span class="std std-ref">위치가 정해진 인자</span></a>를 구별한다.</p>
+<div class="section" id="id2">
+<h2>옵션 이름<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="parameters.html#parameter-names"><span class="std std-ref">매개변수 이름</span></a> 절에서 명명 규칙을 볼 수 있다. 요약하면
+앞에 대시가 붙은 가장 긴 인자로 옵션을 <strong>암묵적으로</strong> 가리킬 수 있다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--string-to-echo&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">echo</span><span class="p">(</span><span class="n">string_to_echo</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">string_to_echo</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>또는 대시 없는 인자를 줘서 <strong>명시적으로</strong> 가리킬 수도 있다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--string-to-echo&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">echo</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>기본 값 옵션<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>가장 기본적인 옵션은 값 옵션이다. 이 옵션들은 값 인자 하나를 받는다.
+타입을 주지 않으면 기본값의 타입을 쓴다. 기본값을 주지 않으면 타입이
+<a class="reference internal" href="api.html#click.STRING" title="click.STRING"><code class="xref py py-data docutils literal notranslate"><span class="pre">STRING</span></code></a>이라고 상정한다. 이름을 명시적으로 지정하지 않으면
+정의된 첫 번째 긴 옵션이 매개변수 이름이 된다. 없으면 첫 번째 짧은
+옵션을 쓴다. 기본적으로 옵션은 필수가 아니다. 옵션을 필수로 만들려면
+데코레이터 인자로 <cite>required=True</cite>를 주면 된다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--n&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">dots</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;.&#39;</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 옵션을 필수로 만들기</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--n&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">dots</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;.&#39;</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 매개변수로 `from` 같은 파이썬 예약어 쓰기</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--from&#39;</span><span class="p">,</span> <span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;from_&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--to&#39;</span><span class="p">,</span> <span class="s1">&#39;-t&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">reserved_param_name</span><span class="p">(</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;from </span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ dots --n=2
+..
+</pre></div>
+</div>
+<p>이 경우 기본값이 정수이므로 옵션이 <a class="reference internal" href="api.html#click.INT" title="click.INT"><code class="xref py py-data docutils literal notranslate"><span class="pre">INT</span></code></a> 타입이다.</p>
+<p>명령 도움말을 보일 때 기본값을 표시하려면 <code class="docutils literal notranslate"><span class="pre">show_default=True</span></code>를
+쓰면 된다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--n&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">dots</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;.&#39;</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ dots --help
+Usage: dots [OPTIONS]
+
+Options:
+  --n INTEGER  [default: 1]
+  --help       Show this message and exit.
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>여러 값 옵션<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>인자를 여러 개 받는 옵션이 가끔 있다. 옵션에서는 개수가 정해진
+인자만 지원하며 <code class="docutils literal notranslate"><span class="pre">nargs</span></code> 매개변수로 개수를 설정할 수 있다.
+그러면 값들이 튜플로 저장된다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--pos&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">findme</span><span class="p">(</span><span class="n">pos</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> / </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pos</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ findme --pos 2.0 3.0
+2.0 / 3.0
+</pre></div>
+</div>
+</div>
+<div class="section" id="tuple-type">
+<span id="id5"></span><h2>여러 값 튜플 옵션<a class="headerlink" href="#tuple-type" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 4.0.</span></p>
+</div>
+<p>보다시피 <cite>nargs</cite>를 써서 개수를 지정하면 결과 튜플의 항목들이
+같은 타입이 된다. 원하는 게 그게 아닐 수도 있다. 보통 튜플
+인덱스에 따라 다른 타입을 쓰고 싶을 수도 있을 것이다.
+그렇다면 타입을 직접 튜플로 지정할 수 있다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--item&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">putitem</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;name=</span><span class="si">%s</span><span class="s1"> id=</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">item</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ putitem --item peter 1338
+name=peter id=1338
+</pre></div>
+</div>
+<p>튜플 리터럴을 타입으로 쓰면 <cite>nargs</cite>가 자동으로 그 튜플 길이로
+설정되고 자동으로 <a class="reference internal" href="api.html#click.Tuple" title="click.Tuple"><code class="xref py py-class docutils literal notranslate"><span class="pre">click.Tuple</span></code></a> 타입이 쓰인다.
+즉 위 예는 다음과 동등하다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--item&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Tuple</span><span class="p">([</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]))</span>
+<span class="k">def</span> <span class="nf">putitem</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;name=</span><span class="si">%s</span><span class="s1"> id=</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">item</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id6">
+<h2>다중 옵션<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">nargs</span></code>와 비슷하게 매개변수를 여러 번 지정하는 걸 지원하면서
+(마지막 값만이 아니라) 모든 값이 기록되게 하고 싶은 경우도 있다.
+예를 들어 <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">foo</span> <span class="pre">-m</span> <span class="pre">bar</span></code>라고 하면 커밋 메시지로
+<code class="docutils literal notranslate"><span class="pre">foo</span></code>와 <code class="docutils literal notranslate"><span class="pre">bar</span></code> 두 줄을 기록하게 된다. <code class="docutils literal notranslate"><span class="pre">multiple</span></code> 플래그로
+그렇게 할 수 있다.</p>
+<p>예:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--message&#39;</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="n">multiple</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ commit -m foo -m bar
+foo
+bar
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h2>개수 세기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<p>일부 아주 드문 상황에선 옵션 반복 횟수를 정수로 세고 싶을 수 있다.
+예를 들어 상세 수준 플래그에 쓸 수 있다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">verbose</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Verbosity: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">verbose</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ log -vvv
+Verbosity: 3
+</pre></div>
+</div>
+</div>
+<div class="section" id="id8">
+<h2>불리언 플래그<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<p>불리언 플래그란 켜고 끌 수 있는 옵션이다. 옵션을 켜거나 끄기
+위한 두 플래그를 슬래시(<code class="docutils literal notranslate"><span class="pre">/</span></code>)로 구분해서 한꺼번에 정의하면 된다.
+(옵션 문자열 안에 슬래시가 있으면 클릭에선 자동으로 불리언
+플래그임을 알고 암묵적으로 <code class="docutils literal notranslate"><span class="pre">is_flag=True</span></code>를 전달한다.)
+클릭에서는 나중에 기본값을 바꿀 수 있도록 항상 켜는 플래그와
+끄는 플래그를 모두 제공하기를 기대한다.</p>
+<p>예:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--shout/--no-shout&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">shout</span><span class="p">):</span>
+    <span class="n">rv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+    <span class="k">if</span> <span class="n">shout</span><span class="p">:</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="n">rv</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;!!!!111&#39;</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">rv</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ info --shout
+LINUX!!!!111
+$ info --no-shout
+linux
+</pre></div>
+</div>
+<p>끄는 스위치가 정말 필요 없다면 한쪽만 정의하고 그게 플래그라는
+걸 클릭에게 수동으로 알려 주면 된다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--shout&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">shout</span><span class="p">):</span>
+    <span class="n">rv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+    <span class="k">if</span> <span class="n">shout</span><span class="p">:</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="n">rv</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;!!!!111&#39;</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">rv</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ info --shout
+LINUX!!!!111
+</pre></div>
+</div>
+<p>참고로 옵션에 이미 슬래시가 들어간다면 (예를 들어 <code class="docutils literal notranslate"><span class="pre">/</span></code>가 앞에 오는
+윈도우 방식 매개변수를 쓴다면) 대신 <code class="docutils literal notranslate"><span class="pre">;</span></code>으로 매개변수를 나눌 수
+있다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;/debug;/no-debug&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;debug=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">debug</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">log</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 6.0.</span></p>
+</div>
+<p>두 번째 옵션에만 별칭을 주고 싶다면 형식 문자열에서 앞에 공백을
+줘서 구별해 줘야 한다.</p>
+<p>예:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--shout/--no-shout&#39;</span><span class="p">,</span> <span class="s1">&#39; /-S&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">shout</span><span class="p">):</span>
+    <span class="n">rv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+    <span class="k">if</span> <span class="n">shout</span><span class="p">:</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="n">rv</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;!!!!111&#39;</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">rv</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ info --help
+Usage: info [OPTIONS]
+
+Options:
+  --shout / -S, --no-shout
+  --help                    Show this message and exit.
+</pre></div>
+</div>
+</div>
+<div class="section" id="id9">
+<h2>기능 스위치<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<p>불리언 플래그 외에 기능 스위치라는 것도 있다. 같은 매개변수 이름으로
+여러 옵션을 설정하고 플래그 값을 정의해 주면 된다. 참고로
+<code class="docutils literal notranslate"><span class="pre">flag_value</span></code> 매개변수를 주면 클릭에서 암묵적으로 <code class="docutils literal notranslate"><span class="pre">is_flag=True</span></code>를
+설정한다.</p>
+<p>기본 플래그를 설정하려면 기본으로 할 플래그에 <code class="docutils literal notranslate"><span class="pre">default</span></code>를
+<cite>True</cite>로 할당해 주면 된다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--upper&#39;</span><span class="p">,</span> <span class="s1">&#39;transformation&#39;</span><span class="p">,</span> <span class="n">flag_value</span><span class="o">=</span><span class="s1">&#39;upper&#39;</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--lower&#39;</span><span class="p">,</span> <span class="s1">&#39;transformation&#39;</span><span class="p">,</span> <span class="n">flag_value</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">transformation</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span> <span class="n">transformation</span><span class="p">)())</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ info --upper
+LINUX
+$ info --lower
+linux
+$ info
+LINUX
+</pre></div>
+</div>
+</div>
+<div class="section" id="choice-opts">
+<span id="id10"></span><h2>선택 옵션<a class="headerlink" href="#choice-opts" title="Permalink to this headline">¶</a></h2>
+<p>때로는 값 목록 중에 고르는 매개변수가 필요하다. 그런 경우
+<a class="reference internal" href="api.html#click.Choice" title="click.Choice"><code class="xref py py-class docutils literal notranslate"><span class="pre">Choice</span></code></a> 타입을 쓸 수 있다. 유효한 값들의 목록을 줘서
+생성할 수 있다.</p>
+<p>예:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--hash-type&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">([</span><span class="s1">&#39;md5&#39;</span><span class="p">,</span> <span class="s1">&#39;sha1&#39;</span><span class="p">]))</span>
+<span class="k">def</span> <span class="nf">digest</span><span class="p">(</span><span class="n">hash_type</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">hash_type</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>다음처럼 된다.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ digest --hash-type=md5
+md5
+
+$ digest --hash-type=foo
+Usage: digest [OPTIONS]
+Try &quot;digest --help&quot; for help.
+
+Error: Invalid value for &quot;--hash-type&quot;: invalid choice: foo. (choose from md5, sha1)
+
+$ digest --help
+Usage: digest [OPTIONS]
+
+Options:
+  --hash-type [md5|sha1]
+  --help                  Show this message and exit.
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>선택지를 리스트나 튜플로만 줘야 한다. (제너레이터 같은) 다른
+이터러블은 예상치 못한 결과를 유발할 수 있다.</p>
+</div>
+</div>
+<div class="section" id="option-prompting">
+<span id="id11"></span><h2>값 묻기<a class="headerlink" href="#option-prompting" title="Permalink to this headline">¶</a></h2>
+<p>어떤 경우에는 명령행에서 줄 수도 있고 안 주면 사용자 입력을
+요구하는 매개변수가 필요하다. 클릭에서는 <code class="docutils literal notranslate"><span class="pre">prompt</span></code>를 <cite>True</cite>로
+정의해 주면 된다.</p>
+<p>예:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--name&#39;</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Hello </span><span class="si">%s</span><span class="s1">!&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>그러면 다음처럼 된다.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ hello --name=John
+Hello John!
+$ hello
+Name: John
+Hello John!
+</pre></div>
+</div>
+<p>기본 질문 문자열이 마음에 들지 않으면 다른 문자열로 물을
+수도 있다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--name&#39;</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Your name please&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Hello </span><span class="si">%s</span><span class="s1">!&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>다음처럼 된다.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ hello
+Your name please: John
+Hello John!
+</pre></div>
+</div>
+</div>
+<div class="section" id="id12">
+<h2>패스워드 묻기<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<p>클릭에서는 글자 숨기기와 확인용 재입력도 지원한다. 패스워드 입력에
+유용하다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--password&#39;</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide_input</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">confirmation_prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="n">password</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Encrypting password to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;rot13&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>다음처럼 된다.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ encrypt
+Password: 
+Repeat for confirmation: 
+</pre></div>
+</div>
+<p>매개변수들을 이렇게 조합해 쓰는 게 꽤 흔하기 때문에 대신
+<a class="reference internal" href="api.html#click.password_option" title="click.password_option"><code class="xref py py-func docutils literal notranslate"><span class="pre">password_option()</span></code></a> 데코레이터를 쓸 수도 있다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">password_option</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="n">password</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Encrypting password to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;rot13&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id13">
+<h2>동적 프롬프트 기본값<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
+<p>문맥 옵션 <code class="docutils literal notranslate"><span class="pre">auto_envvar_prefix</span></code>와 <code class="docutils literal notranslate"><span class="pre">default_map</span></code>을 통해
+환경이나 설정 파일로부터 옵션 값을 읽을 수 있다.
+하지만 이 방식은 프롬프트 동작을 무시하며, 그래서 사용자가
+대화식으로 값을 바꿀 방법이 없다.</p>
+<p>사용자가 기본값을 설정할 수 있도록 하되 명령행에 옵션이 없으면
+물어보도록 하고 싶다면 기본값으로 호출 가능 객체를 주면 된다.
+예를 들어 환경에서 기본값을 얻으려면 다음처럼 하면 된다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--username&#39;</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;USER&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello,&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>뭐가 기본값이 되는지 설명하려면 <code class="docutils literal notranslate"><span class="pre">show_default</span></code>에 설정하면 된다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--username&#39;</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;USER&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+              <span class="n">show_default</span><span class="o">=</span><span class="s1">&#39;current user&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello,&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ hello --help
+Usage: hello [OPTIONS]
+
+Options:
+  --username TEXT  [default: (current user)]
+  --help           Show this message and exit.
+</pre></div>
+</div>
+</div>
+<div class="section" id="id14">
+<h2>콜백과 긴급 옵션<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h2>
+<p>때로는 매개변수에 따라 실행 흐름이 완전히 달라지게 하고 싶은
+경우가 있다. 예를 들어 <code class="docutils literal notranslate"><span class="pre">--version</span></code> 매개변수가 있어서 버전을
+찍고 바로 응용을 끝내고 싶은 경우가 그렇다.</p>
+<p>참고: 재사용 가능한 <code class="docutils literal notranslate"><span class="pre">--version</span></code> 매개변수 구현이 클릭에
+<a class="reference internal" href="api.html#click.version_option" title="click.version_option"><code class="xref py py-func docutils literal notranslate"><span class="pre">click.version_option()</span></code></a>으로 포함돼 있다. 아래 코드는
+그런 플래그를 어떻게 구현할 수 있는지 보여 주기 위한 예일 뿐이다.</p>
+<p>그런 경우에 두 가지 개념이 필요한데, 긴급(eager) 매개변수와
+콜백이다. 긴급 매개변수란 다른 것보다 먼저 처리하는 매개변수고
+콜백은 매개변수 처리 후에 실행되는 뭔가다. 앞쪽의 필수 매개변수
+때문에 오류 메시지가 나오는 걸 피하려면 긴급도가 필요하다.
+예를 들어 <code class="docutils literal notranslate"><span class="pre">--version</span></code>이 긴급 매개변수가 아닌데 매개변수
+<code class="docutils literal notranslate"><span class="pre">--foo</span></code>가 필수고 먼저 정의돼 있으면 그 매개변수를 지정해
+줘야 <code class="docutils literal notranslate"><span class="pre">--version</span></code>이 동작하게 된다. 자세한 내용은
+<a class="reference internal" href="advanced.html#callback-evaluation-order"><span class="std std-ref">콜백 평가 순서</span></a> 참고.</p>
+<p>콜백은 함수이고 현재 <a class="reference internal" href="api.html#click.Context" title="click.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> 및 값으로 호출된다.
+문맥을 통해 응용 끝내기 같은 몇몇 유용한 동작을 이용하거나
+이미 처리된 다른 매개변수에 접근할 수 있다.</p>
+<p>다음은 <code class="docutils literal notranslate"><span class="pre">--version</span></code> 플래그 예시이다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">print_version</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="n">ctx</span><span class="o">.</span><span class="n">resilient_parsing</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Version 1.0&#39;</span><span class="p">)</span>
+    <span class="n">ctx</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--version&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">print_version</span><span class="p">,</span>
+              <span class="n">expose_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_eager</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello</span><span class="p">():</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><cite>expose_value</cite> 매개변수는 별 의미 없는 <code class="docutils literal notranslate"><span class="pre">version</span></code> 매개변수가
+콜백으로 전달되지 않도록 한다. 지정하지 않으면 <cite>hello</cite> 스크립트로
+불리언 하나가 전달된다. <cite>resilient_parsing</cite> 플래그는 실행 흐름을
+바꿀 파괴적 동작 없는 명령행을 파싱 하려고 할 때 클릭에서 문맥에
+설정한다. 이 경우 프로그램에서 빠져나가게 될 테니까 설정 시에는
+아무것도 하지 않는다.</p>
+<p>다음처럼 된다.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ hello
+Hello World!
+$ hello --version
+Version 1.0
+</pre></div>
+</div>
+<div class="admonition- admonition">
+<p class="admonition-title">콜백 시그너처 변경</p>
+<p>클릭 2.0에서 콜백 시그너처가 바뀌었다. 이에 대한
+자세한 내용은 <a class="reference internal" href="upgrading.html#upgrade-to-2-0"><span class="std std-ref">2.0 업그레이드</span></a> 참고.</p>
+</div>
+</div>
+<div class="section" id="yes">
+<h2>Yes 매개변수<a class="headerlink" href="#yes" title="Permalink to this headline">¶</a></h2>
+<p>위험한 동작에 대해 사용자 확인을 받을 수 있다면 아주 좋을 것이다.
+불리언 플래그 <code class="docutils literal notranslate"><span class="pre">--yes</span></code>를 추가하고서 사용자가 그 플래그를 주지
+않으면 콜백이 실패하도록 할 수 있다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">abort_if_false</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--yes&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">abort_if_false</span><span class="p">,</span>
+              <span class="n">expose_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+              <span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Are you sure you want to drop the db?&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">dropdb</span><span class="p">():</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Dropped all tables!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>그러면 명령행에서 다음처럼 된다.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ dropdb
+Are you sure you want to drop the db? [y/N]: n
+Aborted!
+$ dropdb --yes
+Dropped all tables!
+</pre></div>
+</div>
+<p>매개변수들을 이렇게 조합해서 쓰는 게 꽤 흔하기 때문에 대신
+<a class="reference internal" href="api.html#click.confirmation_option" title="click.confirmation_option"><code class="xref py py-func docutils literal notranslate"><span class="pre">confirmation_option()</span></code></a> 데코레이터를 쓸 수도 있다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">confirmation_option</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Are you sure you want to drop the db?&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">dropdb</span><span class="p">():</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Dropped all tables!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition- admonition">
+<p class="admonition-title">콜백 시그너처 변경</p>
+<p>클릭 2.0에서 콜백 시그너처가 바뀌었다. 이에 대한
+자세한 내용은 <a class="reference internal" href="upgrading.html#upgrade-to-2-0"><span class="std std-ref">2.0 업그레이드</span></a> 참고.</p>
+</div>
+</div>
+<div class="section" id="id15">
+<h2>환경 변수에서 값 얻기<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
+<p>클릭에서 유용한 기능으로 일반 매개변수뿐 아니라 환경 변수로부터
+매개변수를 받는 동작이 있다. 이를 통해 도구들을 손쉽게
+자동화할 수 있다. 예를 들어 설정 파일을 <code class="docutils literal notranslate"><span class="pre">--config</span></code> 매개변수로
+줄 수도 있지만 더 편한 개발을 위해 <code class="docutils literal notranslate"><span class="pre">TOOL_CONFIG=hello.cfg</span></code>
+처럼 키-값 쌍으로 지정할 수도 있을 것이다.</p>
+<p>클릭에서는 두 가지 방식을 지원한다. 하나는 환경 변수를 자동으로
+구성해 주는 방식으로, 옵션에서만 가능하다. 이 기능을 켜려면
+스크립트를 호출할 때 <code class="docutils literal notranslate"><span class="pre">auto_envvar_prefix</span></code> 매개변수를 줘야 한다.
+그러면 각 명령 및 매개변수에 대해 밑줄로 구분된 대문자 변수가
+추가된다. 가령 <code class="docutils literal notranslate"><span class="pre">foo</span></code>라는 하위 명령이 있어서 <code class="docutils literal notranslate"><span class="pre">bar</span></code>라는
+옵션을 받으며 접두 문자열이 <code class="docutils literal notranslate"><span class="pre">MY_TOOL</span></code>이라면 변수는
+<code class="docutils literal notranslate"><span class="pre">MY_TOOL_FOO_BAR</span></code>가 된다.</p>
+<p>사용례:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--username&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">greet</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Hello </span><span class="si">%s</span><span class="s1">!&#39;</span> <span class="o">%</span> <span class="n">username</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">greet</span><span class="p">(</span><span class="n">auto_envvar_prefix</span><span class="o">=</span><span class="s1">&#39;GREETER&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ export GREETER_USERNAME=john
+$ greet
+Hello john!
+</pre></div>
+</div>
+<p>명령 그룹에 <code class="docutils literal notranslate"><span class="pre">auto_envvar_prefix</span></code>를 쓸 때는 환경 변수의
+접두 문자열과 매개변수 이름 사이에 명령 이름이 들어가야 한다.
+즉 <em>PREFIX_COMMAND_VARIABLE</em>이다.</p>
+<p>예:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--debug/--no-debug&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cli</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Debug mode is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;on&#39;</span> <span class="k">if</span> <span class="n">debug</span> <span class="k">else</span> <span class="s1">&#39;off&#39;</span><span class="p">))</span>
+
+<span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--username&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">greet</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Hello </span><span class="si">%s</span><span class="s1">!&#39;</span> <span class="o">%</span> <span class="n">username</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">cli</span><span class="p">(</span><span class="n">auto_envvar_prefix</span><span class="o">=</span><span class="s1">&#39;GREETER&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ export GREETER_DEBUG=false
+$ export GREETER_GREET_USERNAME=John
+$ cli greet
+Debug mode is off
+Hello John!
+</pre></div>
+</div>
+<p>두 번째 방식은 옵션에 환경 변수 이름을 지정해서 직접 특정
+환경 변수의 값을 가져오는 방식이다.</p>
+<p>사용례:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--username&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;USERNAME&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">greet</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Hello </span><span class="si">%s</span><span class="s1">!&#39;</span> <span class="o">%</span> <span class="n">username</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">greet</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ export USERNAME=john
+$ greet
+Hello john!
+</pre></div>
+</div>
+<p>이 경우 여러 환경 변수들의 목록을 줄 수도 있으며 그러면
+첫 번째로 정의돼 있는 변수를 쓴다.</p>
+</div>
+<div class="section" id="id16">
+<h2>환경 값에서 여러 값 얻기<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h2>
+<p>옵션에서 여러 값을 받을 수 있을 때 (문자열인) 환경 변수에서
+그 값들을 가져오는 건 좀 더 복잡하다. 클릭에서는 각 타입에서
+알아서 적당한 방식으로 동작하게 맡기는 방식으로 이 문제를
+해결한다. <code class="docutils literal notranslate"><span class="pre">multiple</span></code>이나 <code class="docutils literal notranslate"><span class="pre">1</span></code> 아닌 값의 <code class="docutils literal notranslate"><span class="pre">nargs</span></code>가 있을 때
+클릭에서 <a class="reference internal" href="api.html#click.ParamType.split_envvar_value" title="click.ParamType.split_envvar_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ParamType.split_envvar_value()</span></code></a> 메소드를 호출해서
+쪼개기를 수행하게 된다.</p>
+<p>모든 타입에서 기본 구현은 공백에서 나누는 것이다. 예외로
+<a class="reference internal" href="api.html#click.File" title="click.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">File</span></code></a> 및 <a class="reference internal" href="api.html#click.Path" title="click.Path"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> 타입에선 운영 체제의 경로 분리
+규칙에 따라 나눈다. 리눅스나 OS X 같은 유닉스 시스템에서는
+콜론(<code class="docutils literal notranslate"><span class="pre">:</span></code>)에서 분리가 이뤄지고 윈도우에서는
+세미콜론(<code class="docutils literal notranslate"><span class="pre">;</span></code>)에서 이뤄진다.</p>
+<p>사용례:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;paths&#39;</span><span class="p">,</span> <span class="s1">&#39;--path&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;PATHS&#39;</span><span class="p">,</span> <span class="n">multiple</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">())</span>
+<span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">perform</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ export PATHS=./foo/bar:./test
+$ perform
+./foo/bar
+./test
+</pre></div>
+</div>
+</div>
+<div class="section" id="id17">
+<h2>다른 시작 문자<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h2>
+<p>클릭에서는 앞에 <code class="docutils literal notranslate"><span class="pre">-</span></code> 대신 다른 문자를 쓰는 옵션을 다룰 수 있다.
+예를 들어 슬래시를 매개변수 <code class="docutils literal notranslate"><span class="pre">/</span></code>로 처리하거나 비슷한 뭔가를 하고
+싶을 때 유용하다. 하지만 일반적으로 가능하면 그렇게 하지 않는 게 좋다.
+클릭에서는 개발자들이 POSIX 동작 방식과 비슷하게 가길 바라기
+때문이다. 하지만 어떤 경우에는 이게 유용할 수도 있다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;+w/-w&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">chmod</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;writable=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">w</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">chmod</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ chmod +w
+writable=True
+$ chmod -w
+writable=False
+</pre></div>
+</div>
+<p>참고로 접두 문자로 <code class="docutils literal notranslate"><span class="pre">/</span></code>를 쓰고 있을 때 불리언 플래그를 사용하고
+싶으면 <code class="docutils literal notranslate"><span class="pre">/</span></code> 대신 <code class="docutils literal notranslate"><span class="pre">;</span></code>로 분리해 줘야 한다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;/debug;/no-debug&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;debug=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">debug</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">log</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ranges">
+<span id="id18"></span><h2>범위 옵션<a class="headerlink" href="#ranges" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="api.html#click.IntRange" title="click.IntRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntRange</span></code></a> 타입은 따로 언급할 필요가 있다. 이 타입은
+<a class="reference internal" href="api.html#click.INT" title="click.INT"><code class="xref py py-data docutils literal notranslate"><span class="pre">INT</span></code></a> 타입과 아주 비슷하게 동작하되 그 값을 (양쪽 경계를
+포함하는) 특정 범위로 제약한다. 두 가지 동작 모드가 있다.</p>
+<ul class="simple">
+<li><p>기본 모드(잘라내지 않기 모드)에서는 값이 범위를 벗어나면
+오류를 일으킨다.</p></li>
+<li><p>선택적인 잘라내기 모드에서는 값이 범위를 벗어나면 잘리게
+된다. 즉 (예를 들어) 범위가 <code class="docutils literal notranslate"><span class="pre">0-5</span></code>일 때 <code class="docutils literal notranslate"><span class="pre">10</span></code> 값은
+<code class="docutils literal notranslate"><span class="pre">5</span></code>를 반환하고 <code class="docutils literal notranslate"><span class="pre">-1</span></code> 값은 <code class="docutils literal notranslate"><span class="pre">0</span></code>을 반환하게 된다.</p></li>
+</ul>
+<p>예:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--count&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">IntRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">clamp</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--digit&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">IntRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">repeat</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">digit</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">digit</span><span class="p">)</span> <span class="o">*</span> <span class="n">count</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">repeat</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>명령행:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ repeat --count=1000 --digit=5
+55555555555555555555
+$ repeat --count=1000 --digit=12
+Usage: repeat [OPTIONS]
+Try &quot;repeat --help&quot; for help.
+
+Error: Invalid value for &quot;--digit&quot;: 12 is not in the valid range of 0 to 10.
+</pre></div>
+</div>
+<p>경계 어느 쪽에든 <code class="docutils literal notranslate"><span class="pre">None</span></code>을 주면 범위 그쪽이 열려 있다는
+뜻이다.</p>
+</div>
+<div class="section" id="id19">
+<h2>검증 콜백<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h2>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.0.</span></p>
+</div>
+<p>별도의 검증 로직을 적용하고 싶다면 매개변수 콜백에서 하면 된다.
+그 콜백은 검증이 실패했을 때 오류를 던질 수 있을 뿐 아니라
+값을 변경할 수도 있다.</p>
+<p>클릭 1.0에서는 <a class="reference internal" href="api.html#click.UsageError" title="click.UsageError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UsageError</span></code></a>만 던질 수 있지만 클릭 2.0부터는
+<a class="reference internal" href="api.html#click.BadParameter" title="click.BadParameter"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BadParameter</span></code></a>도 던질 수 있는데, 자동으로 매개변수 이름을
+포함한 오류 메시지를 만들어 준다는 장점이 있다.</p>
+<p>예:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validate_rolls</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">rolls</span><span class="p">,</span> <span class="n">dice</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">dice</span><span class="p">,</span> <span class="n">rolls</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">click</span><span class="o">.</span><span class="n">BadParameter</span><span class="p">(</span><span class="s1">&#39;rolls need to be in format NdM&#39;</span><span class="p">)</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--rolls&#39;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">validate_rolls</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;1d6&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">roll</span><span class="p">(</span><span class="n">rolls</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Rolling a </span><span class="si">%d</span><span class="s1">-sided dice </span><span class="si">%d</span><span class="s1"> time(s)&#39;</span> <span class="o">%</span> <span class="n">rolls</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">roll</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>그러면 다음처럼 된다.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ roll --rolls=42
+Usage: roll [OPTIONS]
+
+Error: Invalid value for &quot;--rolls&quot;: rolls need to be in format NdM
+
+$ roll --rolls=2d12
+Rolling a 12-sided dice 2 time(s)
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/click-logo-sidebar.png" alt="Logo"/>
+            </a></p>
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">옵션</a><ul>
+<li><a class="reference internal" href="#id2">옵션 이름</a></li>
+<li><a class="reference internal" href="#id3">기본 값 옵션</a></li>
+<li><a class="reference internal" href="#id4">여러 값 옵션</a></li>
+<li><a class="reference internal" href="#tuple-type">여러 값 튜플 옵션</a></li>
+<li><a class="reference internal" href="#id6">다중 옵션</a></li>
+<li><a class="reference internal" href="#id7">개수 세기</a></li>
+<li><a class="reference internal" href="#id8">불리언 플래그</a></li>
+<li><a class="reference internal" href="#id9">기능 스위치</a></li>
+<li><a class="reference internal" href="#choice-opts">선택 옵션</a></li>
+<li><a class="reference internal" href="#option-prompting">값 묻기</a></li>
+<li><a class="reference internal" href="#id12">패스워드 묻기</a></li>
+<li><a class="reference internal" href="#id13">동적 프롬프트 기본값</a></li>
+<li><a class="reference internal" href="#id14">콜백과 긴급 옵션</a></li>
+<li><a class="reference internal" href="#yes">Yes 매개변수</a></li>
+<li><a class="reference internal" href="#id15">환경 변수에서 값 얻기</a></li>
+<li><a class="reference internal" href="#id16">환경 값에서 여러 값 얻기</a></li>
+<li><a class="reference internal" href="#id17">다른 시작 문자</a></li>
+<li><a class="reference internal" href="#ranges">범위 옵션</a></li>
+<li><a class="reference internal" href="#id19">검증 콜백</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="parameters.html" title="previous chapter">매개변수</a>
+          <li>Next: <a href="arguments.html" title="next chapter">인자</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014 Pallets Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+
+  </body>
+</html>

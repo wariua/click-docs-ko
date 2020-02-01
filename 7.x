@@ -1,1 +1,0 @@
-srcs/7.x/docs/_build/html

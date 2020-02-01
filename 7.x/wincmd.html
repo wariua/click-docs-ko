@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>윈도우 콘솔 관련 사항 &#8212; 클릭 문서 (7.x)</title>
+    <link rel="stylesheet" href="_static/click.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/click-icon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="파이썬 3 지원" href="python3.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="api.html" title="API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="python3.html" title="파이썬 3 지원"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">클릭 문서 (7.x)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>윈도우 콘솔 관련 사항<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.</span></p>
+</div>
+<p>클릭 6.0 전까지는 윈도우 콘솔에서 클릭을 쓰는 데 여러 버그와
+제약이 있었다. 특히 파이썬 2에서 잘못된 인코딩으로
+명령행 인자 디코딩을 수행했으며 모든 파이썬 버전에서 유니코드
+문자 출력이 불가능했다. 클릭 6.0부터는 윈도우에서 출력 스트림을
+에뮬레이션 해서 별도 API를 통해 윈도우 콘솔 유니코드 출력을
+지원하며 다양한 매개변수 디코딩을 수행한다.</p>
+<p>그게 어떻게 동작하고 그래서 어떤 의미가 있는지 간단히 살펴보자.</p>
+<div class="section" id="id2">
+<h2>유니코드 인자<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>클릭 내부에서는 기본적으로 어느 인자든 바이트 열 또는 유니코드
+열로 들어올 수 있다는 걸 전제하고 있으며 타입에서 기대하는
+값으로 변환하는 걸 최대한 늦게 수행한다. 이렇게 하면 운영 체제와
+파이썬 버전에 가장 적합한 형태로 데이터를 받을 수 있게 된다는
+장점이 있다.</p>
+<p>예를 들어 따로 지정하지 않는 한 파이썬 2에선 경로를 바이트
+그대로 둔다.</p>
+<p>이게 윈도우에서 문제를 좀 일으켰다. 초기에는 틀린 인코딩을 써서
+입력 데이터가 결국 쓰레기 값이 됐다. 하지만 그 인코딩 부분은
+수정됐으며 지금은 <cite>sys.argv</cite>에서 유니코드 매개변수를 뽑아낸다.</p>
+<p>그로 인해 윈도우 하의 파이썬 2에서는 인자가 <em>거의 확실하게</em>
+바이트가 아니라 유니코드 방식이 된다. 이전에는 명시적으로
+유니코드 매개변수를 주지 않는 한 이런 식으로 동작하지 않았다.
+따라서 따로 만든 타입이 있다면 주의할 필요가 있다.</p>
+<p>다른 제약 사항도 있다. 클릭 핸들러 호출 전에 <cite>sys.argv</cite>가
+변경됐다면 다시 원래의 바이트 입력 방식을 써야 하는데,
+그 경우 유니코드 값 전체가 아니라 매개변수에
+쓰인 코드페이지 일부만 사용 가능하다.</p>
+</div>
+<div class="section" id="id3">
+<h2>유니코드 입출력<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>윈도우에서 유니코드 출력과 입력은 텍스트 스트림 처리 방식으로
+구현돼 있다. 즉 클릭에서 처음 텍스트 출력(또는 입력) 스트림이
+필요할 때 몇 가지 검사를 해서 윈도우 콘솔이 연결돼 있는지
+여부를 알아낸다. 윈도우 콘솔이 없다면 텍스트 출력 스트림을
+그대로 반환하며 그 스트림의 인코딩은 다른 플랫폼과 마찬가지로
+<code class="docutils literal notranslate"><span class="pre">utf-8</span></code>으로 설정돼 있다.</p>
+<p>하지만 콘솔이 연결돼 있으면 대신 스트림을 에뮬레이션 하게 되며
+cmd.exe의 유니코드 API를 써서 텍스트 정보를 출력한다. 이 경우
+그 스트림 역시 내부 인코딩으로 <code class="docutils literal notranslate"><span class="pre">utf-16-le</span></code>를 쓰게 된다.
+하지만 어떤 복잡한 처리가 있어서 저수준 비가공 IO 버퍼가
+유니코드 API를 건너뛰고 있고, 그래서 간접적으로 바이트 출력을
+하는 게 여전히 가능하다.</p>
+<p>그 처리를 파이썬 2와 파이썬 3 모두에서 쓴다. 어느 쪽 버전에서도
+cmd.exe에서의 유니코드 문자 사용을 그냥은 지원하지 않기 때문이다.
+유의해야 할 제약 사항이 몇 가지 있다.</p>
+<ul class="simple">
+<li><p>이런 유니코드 지원은 <code class="docutils literal notranslate"><span class="pre">click.echo</span></code>, <code class="docutils literal notranslate"><span class="pre">click.prompt</span></code>, 그리고
+<code class="docutils literal notranslate"><span class="pre">click.get_text_stream</span></code>에 한정된다.</p></li>
+<li><p>유니코드 값과 바이트 열 중 어느 쪽을 주냐에 따라 내부
+제어 흐름이 완전히 달라지며, 그래서 데이터 일부가 버퍼링
+되는 경우 뭔가 이상한 결과물이 나올 수 있다. 클릭에서는 항상
+직접 플러시를 해서 그런 경우를 막으려 하지만 <code class="docutils literal notranslate"><span class="pre">stdout</span></code>이나
+<code class="docutils literal notranslate"><span class="pre">stderr</span></code>에서 다른 문자열 타입을 섞어서 쓰는 경우에는
+직접 플러시를 해 줘야 한다.</p></li>
+<li><p>비가공 출력 스트림은 윈도우 전체 동작 방식인 이진 모드로 설정돼
+있고, 그래서 <code class="docutils literal notranslate"><span class="pre">print</span></code> 호출이 영향을 받게 된다. <code class="docutils literal notranslate"><span class="pre">print</span></code>보단
+<code class="docutils literal notranslate"><span class="pre">click.echo</span></code>를 쓰자.</p></li>
+<li><p>윈도우 7 및 전에서는 이진 모드에서 한 호출당 최대 64k개
+문자까지만 쓸 수 있다는 제한이 있다. 그 경우 <code class="docutils literal notranslate"><span class="pre">sys.stdout</span></code>
+및 <code class="docutils literal notranslate"><span class="pre">sys.stderr</span></code>를 래퍼로 교체해서 그 제한을 피한다.</p></li>
+</ul>
+<p>또 유의할 사항은 윈도우 콘솔의 기본 폰트가 많은 문자를
+지원하지 않는다는 점이다. 즉 국제적으로 통용되는 문자들은
+가능하지만 이모지나 특수 문자는 거의 안 된다.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/click-logo-sidebar.png" alt="Logo"/>
+            </a></p>
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">윈도우 콘솔 관련 사항</a><ul>
+<li><a class="reference internal" href="#id2">유니코드 인자</a></li>
+<li><a class="reference internal" href="#id3">유니코드 입출력</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="python3.html" title="previous chapter">파이썬 3 지원</a>
+          <li>Next: <a href="api.html" title="next chapter">API</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014 Pallets Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+
+  </body>
+</html>

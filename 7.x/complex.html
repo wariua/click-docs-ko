@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>복잡한 응용 &#8212; 클릭 문서 (7.x)</title>
+    <link rel="stylesheet" href="_static/click.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/click-icon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="고급 패턴" href="advanced.html" />
+    <link rel="prev" title="스크립트 문서화" href="documentation.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="advanced.html" title="고급 패턴"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="documentation.html" title="스크립트 문서화"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">클릭 문서 (7.x)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="complex-guide">
+<span id="id1"></span><h1>복잡한 응용<a class="headerlink" href="#complex-guide" title="Permalink to this headline">¶</a></h1>
+<p>클릭은 제작하려는 CLI 도구가 복잡든 단순하든 도움이 되도록 설계돼
+있다. 하지만 그 설계의 강점은 명령 체계들을 원하는 대로 계층 구조로
+만들 수 있다는 점에 있다. 예를 들어 Django를 써 본 적이 있다면
+따로 명령행 도구가 있다는 걸 알고 있을 텐데, Celery도 마찬가지다.
+그래서 Celery와 Django를 함께 사용할 때는 상호작용이 필요한
+두 가지 도구가 있어서 서로에 대한 설정을 해 줘야 한다.</p>
+<p>어느 상상의 세계에 두 가지 클릭 명령행 도구가 따로 있다면 한 명령
+안에 다른 명령을 포함시켜서 이 문제를 해결할 수 있다. 예를 들면
+웹 프레임워크에서 메시지 큐 프레임워크용 명령들을 함께 올릴 수 있다.</p>
+<div class="section" id="id2">
+<h2>기본 개념<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>그 동작 방식을 이해하려면 먼저 문맥과 호출 규약을 이해해야 한다.</p>
+<div class="section" id="id3">
+<h3>문맥<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>클릭 명령이 실행될 때마다 <a class="reference internal" href="api.html#click.Context" title="click.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> 객체를 만들어서
+그 특정 호출을 위한 상태를 담는다. 즉 파싱 한 매개변수, 객체를
+생성한 명령, 함수 종료 시 정리해야 할 자원 등을 저장해 둔다.
+그리고 원한다면 응용에서 쓰는 객체도 담을 수 있다.</p>
+<p>문맥 객체들은 최상위 객체까지 닿는 연결 리스트를 형성한다.
+그리고 각 문맥은 부모 문맥으로 연결돼 있다. 그래서 어떤 명령이
+다른 명령 아래에서 동작할 때 자기 문맥에 정보를 저장할 수
+있으므로 부모 명령의 상태를 건드리지 않을까 염려할 필요가 없다.</p>
+<p>하지만 부모 데이터에도 접근이 가능하기 때문에 필요하다면
+사용이 가능하다.</p>
+<p>대부분의 경우에는 문맥 객체를 볼 일이 없지만 복잡한 응용을
+작성할 때는 요긴해진다. 그럼 다음 주제를 살펴볼 차례다.</p>
+</div>
+<div class="section" id="id4">
+<h3>호출 규약<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>클릭 명령 콜백이 실행될 때는 값이 지정된 매개변수들을 모두
+키워드 인자로 전달받는다. 그런데 거기 빠져 있는 게 바로 문맥이다.
+하지만 콜백에서 <a class="reference internal" href="api.html#click.pass_context" title="click.pass_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">pass_context()</span></code></a> 표시를 통해 문맥 객체를
+전달받는 방식을 택할 수 있다.</p>
+<p>그런데 콜백에서 문맥을 받는지 아닌지 모른다면 어떻게 명령
+콜백을 호출할 수 있을까? 문맥 자체에서 그에 대한 처리를
+해 주는 헬퍼 함수(<a class="reference internal" href="api.html#click.Context.invoke" title="click.Context.invoke"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Context.invoke()</span></code></a>)를 제공한다.
+그 함수는 콜백을 첫 번째 인자로 받아서 올바르게 함수를 호출해
+준다.</p>
+</div>
+</div>
+<div class="section" id="git-clone">
+<h2>git clone 만들기<a class="headerlink" href="#git-clone" title="Permalink to this headline">¶</a></h2>
+<p>이 예시에서 우리는 어느 버전 관리 시스템을 닮은 명령행 도구를
+만들려고 한다. 일반적으로 Git 같은 시스템에는 최상위 명령이
+하나 있어서 몇몇 매개변수와 설정을 받고 추가로 하위 명령들이
+있어서 다른 일들을 한다.</p>
+<div class="section" id="id5">
+<h3>최상위 명령<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>모든 명령을 담을 수 있는 그룹이 최상위에 필요하다. 이 경우엔
+기본 <a class="reference internal" href="api.html#click.group" title="click.group"><code class="xref py py-func docutils literal notranslate"><span class="pre">click.group()</span></code></a>을 사용하는데, 이를 통해 그 아래에
+다른 클릭 명령들을 등록할 수 있다.</p>
+<p>그리고 이 명령에서 도구의 상태를 설정하는 매개변수 몇 가지를
+받고 싶다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">click</span>
+
+
+<span class="k">class</span> <span class="nc">Repo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">home</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">home</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">home</span> <span class="ow">or</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--repo-home&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;REPO_HOME&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;.repo&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--debug/--no-debug&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+              <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;REPO_DEBUG&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">cli</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">repo_home</span><span class="p">,</span> <span class="n">debug</span><span class="p">):</span>
+    <span class="n">ctx</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">Repo</span><span class="p">(</span><span class="n">repo_home</span><span class="p">,</span> <span class="n">debug</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>뭘 하는 건지 살펴보자. 일단 하위 명령을 등록할 수 있는 그룹 명령을
+만든다. 그 그룹 호출 시 <code class="docutils literal notranslate"><span class="pre">Repo</span></code> 클래스 인스턴스를 생성하게 된다.
+그 인스턴스는 이 명령행 도구를 위한 상태 정보를 담는다. 이 경우에는
+몇 가지 매개변수를 저장할 뿐이지만 이 시점에서 설정 파일을
+읽어 들이거나 할 수도 있다.</p>
+<p>그리고 그 상태 객체를 문맥에 <a class="reference internal" href="api.html#click.Context.obj" title="click.Context.obj"><code class="xref py py-attr docutils literal notranslate"><span class="pre">obj</span></code></a>로 저장해 둔다.
+이 특별한 속성을 통해 명령에서 자식에게 전달해야 하는 것들을
+기억해 둘 수 있다.</p>
+<p>그렇게 되려면 함수에 <a class="reference internal" href="api.html#click.pass_context" title="click.pass_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">pass_context()</span></code></a> 표시를 해 줘야 한다.
+안 그러면 문맥 객체가 완전히 감춰지게 된다.</p>
+</div>
+<div class="section" id="id6">
+<h3>첫 번째 자식 명령<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>첫 번째 자식 명령을 추가해 보자. clone 명령이다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;src&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;dest&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>clone 명령은 만들었는데, 어떻게 저장소에 접근할 수 있을까? 떠올릴
+수 있는 방법 하나는 <a class="reference internal" href="api.html#click.pass_context" title="click.pass_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">pass_context()</span></code></a> 함수를 사용해서 저장소를
+기억시켜 둔 문맥을 콜백에서 받게 하는 것이다. 하지만
+<a class="reference internal" href="api.html#click.pass_obj" title="click.pass_obj"><code class="xref py py-func docutils literal notranslate"><span class="pre">pass_obj()</span></code></a>라는 다른 버전의 데코레이터가 있는데, 이건
+저장된 객체를 (이 경우 저장소를) 전달해 준다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;src&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;dest&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_obj</span>
+<span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h3>끼워 넣은 명령<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>지금 만들려는 프로그램과는 별 관련이 없지만 명령을 끼워 넣는 것도
+꽤 잘 지원할 수 있다. 예를 들어 우리 버전 관리 시스템을 위한 완전
+멋진 플러그인이 있는데 설정이 많이 필요해서 설정들을
+<a class="reference internal" href="api.html#click.Context.obj" title="click.Context.obj"><code class="xref py py-attr docutils literal notranslate"><span class="pre">obj</span></code></a>로 따로 저장한다고 상상해 보자. 그런데 그
+명령 아래에 또 다른 명령을 붙이게 되면 아래의 명령은 느닷없이
+저장소 객체 대신 플러그인 설정을 받게 된다.</p>
+<p>이를 바로잡기 위한 확실한 방법 하나는 플러그인에서 저장소에 대한
+참조를 저장하는 것일 텐데, 하지만 그렇게 하려면 명령에서 자기가
+그런 플러그인 아래 붙어 있는지를 알아야 한다.</p>
+<p>문맥이 연결돼 있다는 특성을 이용하면 훨씬 좋은 방식을 만들 수
+있다. 플러그인 문맥은 저장소를 생성한 문맥에 연결돼 있다.
+그렇기 때문에 문맥에 저장소 객체가 저장돼 있는 지점을 찾을
+때까지 탐색을 해 볼 수 있다.</p>
+<p>이를 위해 있는 게 클릭에 내장된 <a class="reference internal" href="api.html#click.make_pass_decorator" title="click.make_pass_decorator"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_pass_decorator()</span></code></a>
+팩토리인데, 객체를 찾는 데코레이터를 생성해 준다. (내부적으로
+<a class="reference internal" href="api.html#click.Context.find_object" title="click.Context.find_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Context.find_object()</span></code></a>를 호출한다.) 이번 경우에선
+가장 가까이 있는 <code class="docutils literal notranslate"><span class="pre">Repo</span></code> 객체를 찾고 싶은 거니까 다음처럼
+데코레이터를 만들자.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pass_repo</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">make_pass_decorator</span><span class="p">(</span><span class="n">Repo</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>이제 <code class="docutils literal notranslate"><span class="pre">pass_obj</span></code> 대신 <code class="docutils literal notranslate"><span class="pre">pass_repo</span></code>를 사용하면 항상 저장소를
+받게 된다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;src&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;dest&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nd">@pass_repo</span>
+<span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id8">
+<h3>객체가 꼭 있게 하기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>위의 예는 <code class="docutils literal notranslate"><span class="pre">Repo</span></code> 객체를 생성해서 문맥에 저장한 바깥 명령이
+있는 경우에만 제대로 동작한다. 하지만 일부 복잡한 경우에는
+이게 문제가 될 수도 있다. <a class="reference internal" href="api.html#click.make_pass_decorator" title="click.make_pass_decorator"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_pass_decorator()</span></code></a>의 기본
+동작은 <a class="reference internal" href="api.html#click.Context.find_object" title="click.Context.find_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Context.find_object()</span></code></a>를 호출해서 객체를 찾는
+것이다. 그런데 객체를 찾을 수 없으면
+<a class="reference internal" href="api.html#click.make_pass_decorator" title="click.make_pass_decorator"><code class="xref py py-meth docutils literal notranslate"><span class="pre">make_pass_decorator()</span></code></a>가 오류를 던지게 된다. 이와 다른
+동작 방식을 원하면 <a class="reference internal" href="api.html#click.Context.ensure_object" title="click.Context.ensure_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Context.ensure_object()</span></code></a>를 쓰면
+되는데, 객체를 찾아 봤는데 찾을 수 없으면 객체를 하나 생성해서
+가장 가까운 문맥에 저장해 준다. <a class="reference internal" href="api.html#click.make_pass_decorator" title="click.make_pass_decorator"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_pass_decorator()</span></code></a>에
+<code class="docutils literal notranslate"><span class="pre">ensure=True</span></code>를 줘도 이 동작이 켜진다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pass_repo</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">make_pass_decorator</span><span class="p">(</span><span class="n">Repo</span><span class="p">,</span> <span class="n">ensure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>객체가 없으면 생성한 객체를 가장 가까운 문맥에 넣는다. 그렇게
+하면서 원래 거기 있던 객체를 대체하게 될 수도 있다. 그리고 이
+경우엔 외부 명령을 실행하지 않더라도 여전히 명령이 실행
+가능하다. 한편 이 방식이 동작하려면 그 객체 타입에 인자를
+안 받는 생성자가 있어야 한다.</p>
+<p>이제 단독으로도 돈다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@pass_repo</span>
+<span class="k">def</span> <span class="nf">cp</span><span class="p">(</span><span class="n">repo</span><span class="p">):</span>
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">Repo</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>다음처럼 된다.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ cp
+True
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/click-logo-sidebar.png" alt="Logo"/>
+            </a></p>
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">복잡한 응용</a><ul>
+<li><a class="reference internal" href="#id2">기본 개념</a><ul>
+<li><a class="reference internal" href="#id3">문맥</a></li>
+<li><a class="reference internal" href="#id4">호출 규약</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#git-clone">git clone 만들기</a><ul>
+<li><a class="reference internal" href="#id5">최상위 명령</a></li>
+<li><a class="reference internal" href="#id6">첫 번째 자식 명령</a></li>
+<li><a class="reference internal" href="#id7">끼워 넣은 명령</a></li>
+<li><a class="reference internal" href="#id8">객체가 꼭 있게 하기</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="documentation.html" title="previous chapter">스크립트 문서화</a>
+          <li>Next: <a href="advanced.html" title="next chapter">고급 패턴</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014 Pallets Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+
+  </body>
+</html>

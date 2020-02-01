@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>최신 릴리스로 업그레이드 하기 &#8212; 클릭 문서 (7.x)</title>
+    <link rel="stylesheet" href="_static/click.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/click-icon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="라이선스" href="license.html" />
+    <link rel="prev" title="Click Changelog" href="changelog.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="license.html" title="라이선스"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="changelog.html" title="Click Changelog"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">클릭 문서 (7.x)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>최신 릴리스로 업그레이드 하기<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>클릭은 최대한 높은 수준의 하위 호환성을 추구하지만 그게 완전히
+가능하지는 않을 때가 있다. 하위 호환성이 깨지는 경우에 이
+문서에서 업그레이드 방법 내지 올바른 하위 호환성 처리 방법을
+설명한다.</p>
+<div class="section" id="upgrade-to-3-2">
+<span id="id2"></span><h2>3.2 업그레이드<a class="headerlink" href="#upgrade-to-3-2" title="Permalink to this headline">¶</a></h2>
+<p>클릭 3.2에서는 다중 명령에 두 가지 변화를 줘야 했다. 클릭 2와
+클릭 3 사이의 어느 변경 사항에서 유발된 건데 영향이 예상보다
+커졌다.</p>
+<div class="section" id="id3">
+<h3>문맥 호출<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>클릭 3.2에는 <code class="xref py py-meth docutils literal notranslate"><span class="pre">Context.invoke()</span></code> 함수를 다른 명령과 함께
+쓸 때에 대한 수정 사항이 포함돼 있다. 이 함수의 원래 목적은
+함수가 아니라 문맥 객체를 받았을 때 다른 명령을 명령행에서
+들어가는 것처럼 호출하는 것이었다. 이런 용도가 이전에는
+문서 상의 한 곳에만 기록돼 있었고 API 문서에 이 메소드에
+대한 제대로 된 설명이 없었다.</p>
+<p>핵심 문제는 3.2 전에 이 호출이 의도와 어긋나게 동작했다는 것이다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ctx</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">other_command</span><span class="p">,</span> <span class="s1">&#39;arg1&#39;</span><span class="p">,</span> <span class="s1">&#39;arg2&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>절대 이걸 의도한 게 아니다. 이렇게 하면 클릭에서 매개변수를
+어떻게 건드릴 수가 없게 된다. 이 사용 패턴은 한 번도 문서화
+된 적이 없고 의도에 어긋나는 것이다. 그래서 자칫 사용이
+확산돼서 여러 개발자들이 쓰게 되기 전에 버그 수정 릴리스에서
+동작 방식을 바꾸기로 결정이 이뤄졌다.</p>
+<p>위 명령을 올바로 호출하는 방식은 다음과 같다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ctx</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">other_command</span><span class="p">,</span> <span class="n">name_of_arg1</span><span class="o">=</span><span class="s1">&#39;arg1&#39;</span><span class="p">,</span> <span class="n">name_of_arg2</span><span class="o">=</span><span class="s1">&#39;arg2&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>이렇게 하면 이 함수가 기본값을 제대로 다루지 못했던 문제까지
+고칠 수 있게 된다.</p>
+</div>
+<div class="section" id="api">
+<h3>다중 명령 연쇄 API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
+<p>클릭 3에서 다중 명령 연쇄 사용 기능이 추가됐다. 이를 위해선
+클릭 내부에서 보내기를 하는 방식을 바꿔야 했다. 그런데 그게
+올바로 구현되질 않았으며 상위 명령에게 호출될 모든 하위
+명령에 대해 알려 줄 수 있는 API를 제공하는 게 가능해 보였다.</p>
+<p>하지만 그 가정은 과거에 API에서 제시한 보장 사항 한 가지와
+충돌한다. 그래서 안그래도 이미 동작에 문제가 있던 그 기능성을
+3.2에서 제거했다. 대신 의도치 않게 문제가 생겼던
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">Context.invoked_subcommand</span></code> 속성의 기능성을 되살렸다.</p>
+<p>정확히 어떤 명령들이 호출될지 알아야 할 필요가 있다면 여러
+대처 방법이 있다. 첫째로 가능한 방법은 하위 명령 모두가
+함수를 반환하도록 하고서 <code class="xref py py-meth docutils literal notranslate"><span class="pre">Context.resultcallback()</span></code>에서
+그 함수들을 호출하는 것이다.</p>
+</div>
+</div>
+<div class="section" id="upgrade-to-2-0">
+<span id="id4"></span><h2>2.0 업그레이드<a class="headerlink" href="#upgrade-to-2-0" title="Permalink to this headline">¶</a></h2>
+<p>클릭 2.0에는 호환성을 깨는 변화가 한 가지 있는데 바로 매개변수
+콜백 시그너처다. 2.0 전에선 <code class="docutils literal notranslate"><span class="pre">(ctx,</span> <span class="pre">value)</span></code>로 콜백을 호출했지만
+이제는 <code class="docutils literal notranslate"><span class="pre">(ctx,</span> <span class="pre">param,</span> <span class="pre">value)</span></code>다. 이렇게 안 하면 콜백 재사용이
+너무 복잡해지기 때문에 바꿀 필요가 있었다.</p>
+<p>이전을 돕기 위해 클릭에서는 계속 구식 콜백을 받게 된다. 클릭
+3.0부터는 stderr로 경로를 찍어서 업그레이드를 권장할 것이다.</p>
+<p>클릭 1.0과 클릭 2.0을 모두 지원하고 싶은 경우에는 시그너처를
+조정해 주는 간단한 데코레이터를 만들면 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">update_wrapper</span>
+
+<span class="k">def</span> <span class="nf">compatcallback</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="c1"># 클릭 1.0에는 버전 문자열이 없으므로 안전을 위해</span>
+    <span class="c1"># getattr을 써야 한다.</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">click</span><span class="p">,</span> <span class="s1">&#39;__version__&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="s1">&#39;2.0&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span>
+    <span class="k">return</span> <span class="n">update_wrapper</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">f</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="p">),</span> <span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>그 다음엔 다음처럼 작성하면 된다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@compatcallback</span>
+<span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>클릭 1.0에서는 매개변수를 전달하지 않으므로 <cite>param</cite> 인자가
+<cite>None</cite>이 될 것이고, 따라서 호환 콜백에서 그 인자를 사용할
+수 없을 것이다.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/click-logo-sidebar.png" alt="Logo"/>
+            </a></p>
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">최신 릴리스로 업그레이드 하기</a><ul>
+<li><a class="reference internal" href="#upgrade-to-3-2">3.2 업그레이드</a><ul>
+<li><a class="reference internal" href="#id3">문맥 호출</a></li>
+<li><a class="reference internal" href="#api">다중 명령 연쇄 API</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upgrade-to-2-0">2.0 업그레이드</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="changelog.html" title="previous chapter">Click Changelog</a>
+          <li>Next: <a href="license.html" title="next chapter">라이선스</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014 Pallets Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+
+  </body>
+</html>
